@@ -69,23 +69,43 @@ export async function getPrediction(
 
 /** Send a message to the AI assistant and get a response */
 export async function askAssistant(question: string): Promise<string> {
-  await delay(800);
-  // TODO: return await fetch('/api/ask', { method:'POST', body: JSON.stringify({question}) }).then(r=>r.json()).then(d=>d.answer)
-  const q = question.toLowerCase();
-  if (q.includes("highest risk") || q.includes("most at risk")) {
-    return mockAssistantResponses["risk"];
+  try {
+    console.log('Calling chat API with question:', question);
+
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ question })
+    });
+
+    console.log('Chat API response status:', response.status);
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Chat API error response:', errorData);
+      throw new Error(`Chat API error: ${response.status} - ${errorData}`);
+    }
+
+    const data = await response.json();
+    console.log('Chat API response data:', data);
+
+    if (data.error) {
+      console.error('Chat API returned error:', data.error);
+      throw new Error(data.error);
+    }
+
+    if (data.answer) {
+      console.log('Chat answer:', data.answer);
+      return data.answer;
+    } else {
+      console.error('Unexpected response format:', data);
+      throw new Error('Invalid response format from chat API');
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error calling chat API:', errorMessage);
+    return `Error: ${errorMessage}`;
   }
-  if (q.includes("inv-21") || q.includes("inv21")) {
-    return mockAssistantResponses["inv-21"];
-  }
-  if (q.includes("inspect") || q.includes("first") || q.includes("priority")) {
-    return mockAssistantResponses["inspect"];
-  }
-  if (q.includes("overview") || q.includes("plant") || q.includes("summary") || q.includes("status")) {
-    return mockAssistantResponses["overview"];
-  }
-  if (q.includes("degrading") || q.includes("degrad") || q.includes("why")) {
-    return mockAssistantResponses["degrading"];
-  }
-  return mockAssistantResponses["default"];
 }
