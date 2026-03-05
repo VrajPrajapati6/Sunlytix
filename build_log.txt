@@ -1,0 +1,25 @@
+
+> sunlytix@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.35
+  - Environments: .env.local
+
+
+> Build error occurred
+Error: EINVAL: invalid argument, readlink 'C:\Users\princ\OneDrive\Desktop\Ignition\Sunlytix\.next\static\chunks\pages'
+    at async Object.readlink (node:internal/fs/promises:972:10)
+    at async C:\Users\princ\OneDrive\Desktop\Ignition\Sunlytix\node_modules\next\dist\lib\recursive-delete.js:58:30
+    at async Promise.all (index 0)
+    at async recursiveDelete (C:\Users\princ\OneDrive\Desktop\Ignition\Sunlytix\node_modules\next\dist\lib\recursive-delete.js:51:5)
+    at async C:\Users\princ\OneDrive\Desktop\Ignition\Sunlytix\node_modules\next\dist\lib\recursive-delete.js:68:17
+    at async Promise.all (index 0)
+    at async recursiveDelete (C:\Users\princ\OneDrive\Desktop\Ignition\Sunlytix\node_modules\next\dist\lib\recursive-delete.js:51:5)
+    at async C:\Users\princ\OneDrive\Desktop\Ignition\Sunlytix\node_modules\next\dist\lib\recursive-delete.js:68:17
+    at async Promise.all (index 1)
+    at async recursiveDelete (C:\Users\princ\OneDrive\Desktop\Ignition\Sunlytix\node_modules\next\dist\lib\recursive-delete.js:51:5) {
+  errno: -4071,
+  code: 'EINVAL',
+  syscall: 'readlink',
+  path: 'C:\\Users\\princ\\OneDrive\\Desktop\\Ignition\\Sunlytix\\.next\\static\\chunks\\pages'
+}

@@ -30,10 +30,10 @@ export default function InsightsPage() {
   };
 
   const filterOptions: { key: Filter; label: string; style: string }[] = [
-    { key: "all", label: `All (${counts.all})`, style: "text-foreground border-border hover:bg-secondary" },
-    { key: "high", label: `High Risk (${counts.high})`, style: "text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-900/10" },
-    { key: "medium", label: `Medium (${counts.medium})`, style: "text-yellow-600 border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-900/10" },
-    { key: "low", label: `Low (${counts.low})`, style: "text-blue-600 border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/10" },
+    { key: "all", label: `All (${counts.all})`, style: "text-foreground border-border hover:bg-white/5" },
+    { key: "high", label: `High Risk (${counts.high})`, style: "text-[#FF4D4F] border-[#FF4D4F]/30 hover:bg-[#FF4D4F]/10" },
+    { key: "medium", label: `Medium (${counts.medium})`, style: "text-[#FFB020] border-[#FFB020]/30 hover:bg-[#FFB020]/10" },
+    { key: "low", label: `Low (${counts.low})`, style: "text-primary border-primary/30 hover:bg-primary/10" },
   ];
 
   return (
@@ -51,17 +51,17 @@ export default function InsightsPage() {
 
       {/* Summary strip */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-red-600 dark:text-red-400">{counts.high}</p>
-          <p className="text-xs text-red-600/70 dark:text-red-400/70 mt-1">High Risk</p>
+        <div className="bg-[#FF4D4F]/10 border border-[#FF4D4F]/30 rounded-xl p-4 text-center">
+          <p className="text-2xl font-bold text-[#FF4D4F]">{counts.high}</p>
+          <p className="text-xs text-[#FF4D4F]/70 mt-1">High Risk</p>
         </div>
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{counts.medium}</p>
-          <p className="text-xs text-yellow-600/70 dark:text-yellow-400/70 mt-1">Medium Risk</p>
+        <div className="bg-[#FFB020]/10 border border-[#FFB020]/30 rounded-xl p-4 text-center">
+          <p className="text-2xl font-bold text-[#FFB020]">{counts.medium}</p>
+          <p className="text-xs text-[#FFB020]/70 mt-1">Medium Risk</p>
         </div>
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{counts.low}</p>
-          <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">Low Priority</p>
+        <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 text-center">
+          <p className="text-2xl font-bold text-primary">{counts.low}</p>
+          <p className="text-xs text-primary/70 mt-1">Low Priority</p>
         </div>
       </div>
 

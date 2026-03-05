@@ -29,7 +29,7 @@ export function RiskDistributionChart({ healthy, medium, high }: RiskPieProps) {
     { name: "Medium Risk", value: medium },
     { name: "High Risk", value: high },
   ];
-  const COLORS = ["#22c55e", "#eab308", "#ef4444"];
+  const COLORS = ["#00E5A8", "#FFB020", "#FF4D4F"];
 
   return (
     <ResponsiveContainer width="100%" height={220}>
@@ -147,9 +147,9 @@ export function TempTrendChart({ data }: { data: TempPoint[] }) {
         <Line
           type="monotone"
           dataKey="avg"
-          stroke="#f97316"
+          stroke="#FFB020"
           strokeWidth={2.5}
-          dot={{ r: 3, fill: "#f97316" }}
+          dot={{ r: 3, fill: "#FFB020" }}
           activeDot={{ r: 5 }}
           name="Avg Temp (°C)"
         />

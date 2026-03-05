@@ -30,8 +30,8 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        "relative flex flex-col bg-card border-r border-border transition-all duration-300 ease-in-out",
-        collapsed ? "w-16" : "w-60"
+        "relative flex flex-col bg-[#0B0F19] border-r border-border transition-all duration-300 ease-in-out",
+        collapsed ? "w-20" : "w-64"
       )}
     >
       {/* Logo */}
@@ -58,8 +58,8 @@ export default function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150",
                 isActive
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  ? "bg-primary/15 text-primary shadow-[0_0_15px_rgba(79,140,255,0.3)] border border-primary/20"
+                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
               )}
               title={collapsed ? label : undefined}
             >

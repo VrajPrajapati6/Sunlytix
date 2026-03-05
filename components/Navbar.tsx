@@ -1,16 +1,37 @@
 "use client";
 
-import { Bell, Sun, Moon, User } from "lucide-react";
-import { useState } from "react";
+import { Bell, Sun, Moon, User, LogOut, Settings as SettingsIcon, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export default function Navbar() {
+  const router = useRouter();
   const [darkMode, setDarkMode] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setUser(data))
+      .catch(() => setUser(null));
+  }, []);
 
   function toggleDark() {
     setDarkMode((d) => !d);
     document.documentElement.classList.toggle("dark");
+  }
+
+  async function handleLogout() {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   }
 
   const notifications = [
@@ -21,7 +42,7 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="h-14 border-b border-border bg-card flex items-center justify-between px-6 shrink-0">
+    <header className="h-16 border-b border-border bg-[#121826] flex items-center justify-between px-6 shrink-0 relative z-30">
       {/* Brand */}
       <div className="flex items-center gap-2">
         <Sun className="w-5 h-5 text-primary" />
@@ -84,15 +105,57 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* User avatar */}
-        <div className="flex items-center gap-2 pl-2 border-l border-border ml-1">
-          <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-            <User className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <div className="hidden sm:block">
-            <p className="text-xs font-medium text-foreground leading-none">Admin</p>
-            <p className="text-[10px] text-muted-foreground leading-none mt-0.5">Plant Operator</p>
-          </div>
+        {/* User profile */}
+        <div className="relative ml-1">
+          <button
+            onClick={() => setProfileOpen((o) => !o)}
+            className="flex items-center gap-2 p-1 pl-2 border-l border-border hover:bg-secondary/50 rounded-lg transition-colors group"
+          >
+            <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
+              <User className="w-4 h-4 text-primary" />
+            </div>
+            <div className="hidden sm:block text-left">
+              <p className="text-xs font-semibold text-foreground leading-none">
+                {user?.name || "Loading..."}
+              </p>
+              <p className="text-[10px] text-muted-foreground leading-none mt-1">
+                {user ? "Authorized Operator" : "Sunlytix User"}
+              </p>
+            </div>
+            <ChevronDown className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform", profileOpen && "rotate-180")} />
+          </button>
+
+          {profileOpen && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setProfileOpen(false)} />
+              <div className="absolute right-0 top-12 z-20 w-56 bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-4 py-3 border-b border-border bg-secondary/30">
+                  <p className="text-sm font-bold text-foreground truncate">{user?.name || "Solar Operator"}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user?.email || "operator@sunlytix.com"}</p>
+                </div>
+                <div className="p-1.5">
+                  <button
+                    onClick={() => {
+                      setProfileOpen(false);
+                      router.push("/settings");
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-all"
+                  >
+                    <SettingsIcon className="w-4 h-4" />
+                    Account Settings
+                  </button>
+                  <div className="h-px bg-border my-1" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-[#FF4D4F] hover:bg-[#FF4D4F]/10 transition-all"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Log Out
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </header>

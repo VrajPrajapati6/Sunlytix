@@ -12,7 +12,9 @@ import {
   Bell,
   Shield,
   ChevronRight,
+  LogOut,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface ToastState {
@@ -53,17 +55,18 @@ function StatusBadge({ connected }: { connected: boolean }) {
       className={cn(
         "px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5",
         connected
-          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-          : "bg-secondary text-muted-foreground"
+          ? "bg-[rgba(0,229,168,0.15)] text-[#00E5A8]"
+          : "bg-[rgba(255,176,32,0.15)] text-[#FFB020]"
       )}
     >
-      <span className={cn("w-1.5 h-1.5 rounded-full", connected ? "bg-green-500" : "bg-muted-foreground")} />
+      <span className={cn("w-1.5 h-1.5 rounded-full", connected ? "bg-[#00E5A8]" : "bg-[#FFB020]")} />
       {connected ? "Connected" : "Not Connected"}
     </span>
   );
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [scadaConnected, setScadaConnected] = useState(false);
   const [apiConnected, setApiConnected] = useState(false);
   const [uploadMsg, setUploadMsg] = useState<string | null>(null);
@@ -109,6 +112,16 @@ export default function SettingsPage() {
     }
   }
 
+  async function handleLogout() {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }
+
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       {/* Header */}
@@ -142,7 +155,7 @@ export default function SettingsPage() {
               value={scadaUrl}
               onChange={(e) => setScadaUrl(e.target.value)}
               placeholder="https://scada.yourplant.com/api/v1"
-              className="w-full px-3 py-2 text-sm bg-secondary border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-foreground placeholder:text-muted-foreground"
+              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] placeholder:text-[#6B7280] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(79,140,255,0.35)] focus:border-[#4F8CFF] transition-all duration-200"
             />
           </div>
           <div>
@@ -152,12 +165,12 @@ export default function SettingsPage() {
             <input
               type="password"
               placeholder="Bearer token or API key"
-              className="w-full px-3 py-2 text-sm bg-secondary border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-foreground placeholder:text-muted-foreground"
+              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] placeholder:text-[#6B7280] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(79,140,255,0.35)] focus:border-[#4F8CFF] transition-all duration-200"
             />
           </div>
           <button
             onClick={handleScadaConnect}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-[#4F8CFF] text-white rounded-lg text-sm font-medium hover:bg-[#3A74E6] transition-colors"
           >
             <Plug className="w-4 h-4" />
             Connect SCADA API
@@ -183,7 +196,7 @@ export default function SettingsPage() {
             <input
               type="text"
               defaultValue="https://api.sunlytix.io/v1"
-              className="w-full px-3 py-2 text-sm bg-secondary border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-foreground"
+              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(79,140,255,0.35)] focus:border-[#4F8CFF] transition-all duration-200"
             />
           </div>
           <div>
@@ -195,20 +208,20 @@ export default function SettingsPage() {
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="sk-sunlytix-xxxxxxxxxxxx"
-              className="w-full px-3 py-2 text-sm bg-secondary border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-foreground placeholder:text-muted-foreground"
+              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] placeholder:text-[#6B7280] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(79,140,255,0.35)] focus:border-[#4F8CFF] transition-all duration-200"
             />
           </div>
           <div className="flex gap-3">
             <button
               onClick={handleApiConnect}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-[#4F8CFF] text-white rounded-lg text-sm font-medium hover:bg-[#3A74E6] transition-colors"
             >
               <CheckCircle className="w-4 h-4" />
               Connect API
             </button>
             <button
               onClick={() => showToast("Connection test initiated (mock)")}
-              className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground border border-border rounded-lg text-sm font-medium hover:bg-accent transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-[#1A2236] text-[#E6EAF2] border border-[#2A3448] rounded-lg text-sm font-medium hover:bg-[#26314A] transition-colors"
             >
               Test Connection
             </button>
@@ -223,13 +236,13 @@ export default function SettingsPage() {
         icon={FileSpreadsheet}
       >
         <div className="space-y-4">
-          <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
-            <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-foreground font-medium">Drop CSV file here or click to browse</p>
-            <p className="text-xs text-muted-foreground mt-1">
+          <div className="bg-[#121826] border-2 border-dashed border-[#2A3448] rounded-xl p-8 text-center hover:border-[#4F8CFF] transition-colors">
+            <Upload className="w-8 h-8 text-[#9AA4B2] mx-auto mb-3" />
+            <p className="text-sm text-[#E6EAF2] font-medium">Drop CSV file here or click to browse</p>
+            <p className="text-xs text-[#6B7280] mt-1">
               Supports: inverter_id, timestamp, temperature, efficiency, power_output, voltage
             </p>
-            <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors cursor-pointer">
+            <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#4F8CFF] text-white rounded-lg text-sm font-medium hover:bg-[#3A74E6] transition-colors cursor-pointer">
               <Upload className="w-4 h-4" />
               Upload Telemetry Data
               <input
@@ -311,6 +324,16 @@ export default function SettingsPage() {
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
           ))}
+          <div className="h-px bg-border my-2" />
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-[#FF4D4F]/10 hover:bg-[#FF4D4F]/20 transition-colors text-sm text-[#FF4D4F] border border-[#FF4D4F]/20"
+          >
+            <div className="flex items-center gap-3">
+              <LogOut className="w-4 h-4" />
+              <span className="font-semibold">Log Out of Sunlytix</span>
+            </div>
+          </button>
         </div>
       </SettingSection>
 

@@ -13,23 +13,23 @@ interface MetricCardProps {
 const variantStyles = {
   default: {
     card: "bg-card border-border",
-    icon: "bg-primary/10 text-primary",
+    icon: "bg-primary/20 text-primary shadow-[0_0_15px_rgba(79,140,255,0.3)]",
     value: "text-foreground",
   },
   healthy: {
-    card: "bg-card border-green-200 dark:border-green-800",
-    icon: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400",
-    value: "text-green-600 dark:text-green-400",
+    card: "bg-card border-[#00E5A8]/20",
+    icon: "bg-[#00E5A8]/20 text-[#00E5A8] shadow-[0_0_15px_rgba(0,229,168,0.3)]",
+    value: "text-[#00E5A8]",
   },
   medium: {
-    card: "bg-card border-yellow-200 dark:border-yellow-800",
-    icon: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400",
-    value: "text-yellow-600 dark:text-yellow-400",
+    card: "bg-card border-[#FFB020]/20",
+    icon: "bg-[#FFB020]/20 text-[#FFB020] shadow-[0_0_15px_rgba(255,176,32,0.3)]",
+    value: "text-[#FFB020]",
   },
   high: {
-    card: "bg-card border-red-200 dark:border-red-800",
-    icon: "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400",
-    value: "text-red-600 dark:text-red-400",
+    card: "bg-card border-[#FF4D4F]/30",
+    icon: "bg-[#FF4D4F]/20 text-[#FF4D4F] shadow-[0_0_15px_rgba(255,77,79,0.4)]",
+    value: "text-[#FF4D4F]",
   },
 };
 
@@ -46,7 +46,7 @@ export default function MetricCard({
   return (
     <div
       className={cn(
-        "rounded-xl border p-5 shadow-sm flex items-start gap-4 transition-shadow hover:shadow-md",
+        "rounded-xl border p-5 shadow-sm flex items-start gap-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1",
         styles.card
       )}
     >
@@ -61,7 +61,7 @@ export default function MetricCard({
           <p
             className={cn(
               "text-xs font-medium mt-1.5",
-              trend.positive ? "text-green-600 dark:text-green-400" : "text-red-500"
+              trend.positive ? "text-[#00E5A8]" : "text-[#FF4D4F]"
             )}
           >
             {trend.positive ? "↑" : "↓"} {trend.value}

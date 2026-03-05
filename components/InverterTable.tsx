@@ -11,15 +11,15 @@ interface InverterTableProps {
 }
 
 const statusStyles: Record<InverterStatus, string> = {
-  Healthy: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-  "Medium Risk": "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-  "High Risk": "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  Healthy: "bg-[#00E5A8]/20 text-[#00E5A8]",
+  "Medium Risk": "bg-[#FFB020]/20 text-[#FFB020]",
+  "High Risk": "bg-[#FF4D4F]/20 text-[#FF4D4F]",
 };
 
 const riskBarColor: Record<InverterStatus, string> = {
-  Healthy: "bg-green-500",
-  "Medium Risk": "bg-yellow-500",
-  "High Risk": "bg-red-500",
+  Healthy: "bg-[#00E5A8]",
+  "Medium Risk": "bg-[#FFB020]",
+  "High Risk": "bg-[#FF4D4F]",
 };
 
 type SortField = keyof Pick<Inverter, "id" | "location" | "MODULE_TEMPERATURE" | "DC_POWER" | "AC_POWER" | "IRRADIATION" | "riskScore">;
@@ -77,7 +77,7 @@ export default function InverterTable({ inverters }: InverterTableProps) {
             placeholder="Search inverters..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-secondary border border-border rounded-lg outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-foreground placeholder:text-muted-foreground"
+            className="w-full pl-9 pr-4 py-2 text-sm bg-secondary/50 border border-border rounded-lg outline-none focus:ring-1 focus:ring-primary focus:border-primary text-foreground placeholder:text-muted-foreground transition-all duration-200"
           />
         </div>
         <p className="text-xs text-muted-foreground mt-2">
@@ -134,10 +134,10 @@ export default function InverterTable({ inverters }: InverterTableProps) {
                     className={cn(
                       "font-medium",
                       inv.MODULE_TEMPERATURE >= 65
-                        ? "text-red-600 dark:text-red-400"
+                        ? "text-[#FF4D4F]"
                         : inv.MODULE_TEMPERATURE >= 50
-                        ? "text-yellow-600 dark:text-yellow-400"
-                        : "text-foreground"
+                          ? "text-[#FFB020]"
+                          : "text-foreground"
                     )}
                   >
                     {inv.MODULE_TEMPERATURE}°C
