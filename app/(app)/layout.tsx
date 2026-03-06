@@ -1,5 +1,4 @@
-import Sidebar from "@/components/Sidebar";
-import Navbar from "@/components/Navbar";
+import DashboardHeader from "@/components/DashboardHeader";
 
 export default function AppLayout({
   children,
@@ -7,12 +6,9 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Navbar />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
+    <div className="flex flex-col h-screen overflow-hidden bg-black text-white">
+      <DashboardHeader />
+      <main className="flex-1 overflow-y-auto bg-grid-pattern">{children}</main>
     </div>
   );
 }

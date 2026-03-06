@@ -135,100 +135,6 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* SCADA Integration */}
-      <SettingSection
-        title="SCADA Integration"
-        description="Connect to your SCADA system for real-time telemetry"
-        icon={Wifi}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Connection Status</p>
-            <StatusBadge connected={scadaConnected} />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
-              SCADA Endpoint URL
-            </label>
-            <input
-              type="text"
-              value={scadaUrl}
-              onChange={(e) => setScadaUrl(e.target.value)}
-              placeholder="https://scada.yourplant.com/api/v1"
-              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] placeholder:text-[#6B7280] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(79,140,255,0.35)] focus:border-[#4F8CFF] transition-all duration-200"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
-              Authentication Token
-            </label>
-            <input
-              type="password"
-              placeholder="Bearer token or API key"
-              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] placeholder:text-[#6B7280] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(79,140,255,0.35)] focus:border-[#4F8CFF] transition-all duration-200"
-            />
-          </div>
-          <button
-            onClick={handleScadaConnect}
-            className="flex items-center gap-2 px-4 py-2 bg-[#4F8CFF] text-white rounded-lg text-sm font-medium hover:bg-[#3A74E6] transition-colors"
-          >
-            <Plug className="w-4 h-4" />
-            Connect SCADA API
-          </button>
-        </div>
-      </SettingSection>
-
-      {/* Backend API */}
-      <SettingSection
-        title="Backend API Connection"
-        description="Connect to the Sunlytix ML backend for live predictions"
-        icon={Database}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">API Status</p>
-            <StatusBadge connected={apiConnected} />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
-              API Base URL
-            </label>
-            <input
-              type="text"
-              defaultValue="https://api.sunlytix.io/v1"
-              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(79,140,255,0.35)] focus:border-[#4F8CFF] transition-all duration-200"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
-              API Key
-            </label>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk-sunlytix-xxxxxxxxxxxx"
-              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] placeholder:text-[#6B7280] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(79,140,255,0.35)] focus:border-[#4F8CFF] transition-all duration-200"
-            />
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleApiConnect}
-              className="flex items-center gap-2 px-4 py-2 bg-[#4F8CFF] text-white rounded-lg text-sm font-medium hover:bg-[#3A74E6] transition-colors"
-            >
-              <CheckCircle className="w-4 h-4" />
-              Connect API
-            </button>
-            <button
-              onClick={() => showToast("Connection test initiated (mock)")}
-              className="flex items-center gap-2 px-4 py-2 bg-[#1A2236] text-[#E6EAF2] border border-[#2A3448] rounded-lg text-sm font-medium hover:bg-[#26314A] transition-colors"
-            >
-              Test Connection
-            </button>
-          </div>
-        </div>
-      </SettingSection>
-
       {/* CSV Upload */}
       <SettingSection
         title="CSV Data Upload"
@@ -236,13 +142,13 @@ export default function SettingsPage() {
         icon={FileSpreadsheet}
       >
         <div className="space-y-4">
-          <div className="bg-[#121826] border-2 border-dashed border-[#2A3448] rounded-xl p-8 text-center hover:border-[#4F8CFF] transition-colors">
+          <div className="bg-[#121826] border-2 border-dashed border-[#2A3448] rounded-xl p-8 text-center hover:border-[#FF6A00] transition-colors">
             <Upload className="w-8 h-8 text-[#9AA4B2] mx-auto mb-3" />
             <p className="text-sm text-[#E6EAF2] font-medium">Drop CSV file here or click to browse</p>
             <p className="text-xs text-[#6B7280] mt-1">
               Supports: inverter_id, timestamp, temperature, efficiency, power_output, voltage
             </p>
-            <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#4F8CFF] text-white rounded-lg text-sm font-medium hover:bg-[#3A74E6] transition-colors cursor-pointer">
+            <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors cursor-pointer">
               <Upload className="w-4 h-4" />
               Upload Telemetry Data
               <input
@@ -264,6 +170,100 @@ export default function SettingsPage() {
             <code className="text-xs text-muted-foreground font-mono">
               inverter_id,timestamp,temperature,efficiency,power_output,voltage,current,alarm_count
             </code>
+          </div>
+        </div>
+      </SettingSection>
+
+      {/* SCADA Integration */}
+      <SettingSection
+        title="SCADA Integration"
+        description="Connect to your SCADA system for real-time telemetry"
+        icon={Wifi}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Connection Status</p>
+            <StatusBadge connected={scadaConnected} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+              SCADA Endpoint URL
+            </label>
+            <input
+              type="text"
+              value={scadaUrl}
+              onChange={(e) => setScadaUrl(e.target.value)}
+              placeholder="https://scada.yourplant.com/api/v1"
+              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] placeholder:text-[#6B7280] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(255,106,0,0.35)] focus:border-[#FF6A00] transition-all duration-200"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+              Authentication Token
+            </label>
+            <input
+              type="password"
+              placeholder="Bearer token or API key"
+              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] placeholder:text-[#6B7280] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(255,106,0,0.35)] focus:border-[#FF6A00] transition-all duration-200"
+            />
+          </div>
+          <button
+            onClick={handleScadaConnect}
+            className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+          >
+            <Plug className="w-4 h-4" />
+            Connect SCADA API
+          </button>
+        </div>
+      </SettingSection>
+
+      {/* Backend API */}
+      <SettingSection
+        title="Backend API Connection"
+        description="Connect to the Sunlytix backend API"
+        icon={Database}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">API Status</p>
+            <StatusBadge connected={apiConnected} />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+              API Base URL
+            </label>
+            <input
+              type="text"
+              defaultValue="https://api.sunlytix.io/v1"
+              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(255,106,0,0.35)] focus:border-[#FF6A00] transition-all duration-200"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+              API Key
+            </label>
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="sk-sunlytix-xxxxxxxxxxxx"
+              className="w-full px-4 py-2.5 text-sm bg-[#121826] border border-[#2A3448] text-[#E6EAF2] placeholder:text-[#6B7280] rounded-lg outline-none focus:ring-[3px] focus:ring-[rgba(255,106,0,0.35)] focus:border-[#FF6A00] transition-all duration-200"
+            />
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleApiConnect}
+              className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+            >
+              <CheckCircle className="w-4 h-4" />
+              Connect API
+            </button>
+            <button
+              onClick={() => showToast("Connection test initiated (mock)")}
+              className="flex items-center gap-2 px-4 py-2 bg-[#1A2236] text-[#E6EAF2] border border-[#2A3448] rounded-lg text-sm font-medium hover:bg-[#26314A] transition-colors"
+            >
+              Test Connection
+            </button>
           </div>
         </div>
       </SettingSection>

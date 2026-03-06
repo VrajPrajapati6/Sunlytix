@@ -29,7 +29,7 @@ export function RiskDistributionChart({ healthy, medium, high }: RiskPieProps) {
     { name: "Medium Risk", value: medium },
     { name: "High Risk", value: high },
   ];
-  const COLORS = ["#00E5A8", "#FFB020", "#FF4D4F"];
+  const COLORS = ["#10b981", "#FF6A00", "#ef4444"];
 
   return (
     <ResponsiveContainer width="100%" height={220}>
@@ -49,16 +49,16 @@ export function RiskDistributionChart({ healthy, medium, high }: RiskPieProps) {
         </Pie>
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
+            background: "#111111",
+            border: "1px solid #1f1f1f",
             borderRadius: "8px",
             fontSize: "12px",
-            color: "hsl(var(--foreground))",
+            color: "#ffffff",
           }}
         />
         <Legend
           formatter={(value) => (
-            <span style={{ color: "hsl(var(--muted-foreground))", fontSize: "12px" }}>{value}</span>
+            <span style={{ color: "#A0A0A0", fontSize: "12px" }}>{value}</span>
           )}
         />
       </PieChart>
@@ -76,34 +76,34 @@ export function PowerTrendChart({ data }: { data: TrendPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#1f1f1f" />
         <XAxis
           dataKey="date"
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+          tick={{ fill: "#A0A0A0", fontSize: 11 }}
           tickLine={false}
           axisLine={false}
         />
         <YAxis
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+          tick={{ fill: "#A0A0A0", fontSize: 11 }}
           tickLine={false}
           axisLine={false}
           domain={["auto", "auto"]}
         />
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
+            background: "#111111",
+            border: "1px solid #1f1f1f",
             borderRadius: "8px",
             fontSize: "12px",
-            color: "hsl(var(--foreground))",
+            color: "#ffffff",
           }}
         />
         <Line
           type="monotone"
           dataKey="output"
-          stroke="hsl(var(--primary))"
+          stroke="#FF6A00"
           strokeWidth={2.5}
-          dot={{ r: 3, fill: "hsl(var(--primary))" }}
+          dot={{ r: 3, fill: "#FF6A00" }}
           activeDot={{ r: 5 }}
           name="Power (kW)"
         />
@@ -122,34 +122,34 @@ export function TempTrendChart({ data }: { data: TempPoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#1f1f1f" />
         <XAxis
           dataKey="date"
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+          tick={{ fill: "#A0A0A0", fontSize: 11 }}
           tickLine={false}
           axisLine={false}
         />
         <YAxis
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+          tick={{ fill: "#A0A0A0", fontSize: 11 }}
           tickLine={false}
           axisLine={false}
           domain={["auto", "auto"]}
         />
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
+            background: "#111111",
+            border: "1px solid #1f1f1f",
             borderRadius: "8px",
             fontSize: "12px",
-            color: "hsl(var(--foreground))",
+            color: "#ffffff",
           }}
         />
         <Line
           type="monotone"
           dataKey="avg"
-          stroke="#FFB020"
+          stroke="#FFA94D"
           strokeWidth={2.5}
-          dot={{ r: 3, fill: "#FFB020" }}
+          dot={{ r: 3, fill: "#FFA94D" }}
           activeDot={{ r: 5 }}
           name="Avg Temp (°C)"
         />
@@ -172,7 +172,7 @@ export function TelemetryLineChart({ data, metric }: { data: TelemetryPoint[]; m
   const config = {
     MODULE_TEMPERATURE: { color: "#f97316", name: "Module Temp (°C)", domain: [20, 90] as [number, number] },
     AMBIENT_TEMPERATURE: { color: "#fb923c", name: "Ambient Temp (°C)", domain: [20, 60] as [number, number] },
-    AC_POWER: { color: "hsl(var(--primary))", name: "AC Power (W)", domain: [0, 600] as [number, number] },
+    AC_POWER: { color: "#FF6A00", name: "AC Power (W)", domain: [0, 600] as [number, number] },
     DC_POWER: { color: "#8b5cf6", name: "DC Power (W)", domain: [0, 640] as [number, number] },
     IRRADIATION: { color: "#eab308", name: "Irradiation (W/m²)", domain: [0, 1050] as [number, number] },
   };
@@ -181,27 +181,27 @@ export function TelemetryLineChart({ data, metric }: { data: TelemetryPoint[]; m
   return (
     <ResponsiveContainer width="100%" height={200}>
       <LineChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#1f1f1f" />
         <XAxis
           dataKey="time"
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+          tick={{ fill: "#A0A0A0", fontSize: 10 }}
           tickLine={false}
           axisLine={false}
           interval={3}
         />
         <YAxis
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+          tick={{ fill: "#A0A0A0", fontSize: 10 }}
           tickLine={false}
           axisLine={false}
           domain={domain}
         />
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
+            background: "#111111",
+            border: "1px solid #1f1f1f",
             borderRadius: "8px",
             fontSize: "12px",
-            color: "hsl(var(--foreground))",
+            color: "#ffffff",
           }}
         />
         <Line
@@ -228,10 +228,10 @@ export function FeatureImportanceChart({ data }: { data: FeaturePoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#1f1f1f" horizontal={false} />
         <XAxis
           type="number"
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+          tick={{ fill: "#A0A0A0", fontSize: 11 }}
           tickLine={false}
           axisLine={false}
           domain={[0, 0.5]}
@@ -240,22 +240,22 @@ export function FeatureImportanceChart({ data }: { data: FeaturePoint[] }) {
         <YAxis
           type="category"
           dataKey="feature"
-          tick={{ fill: "hsl(var(--foreground))", fontSize: 11 }}
+          tick={{ fill: "#ffffff", fontSize: 11 }}
           tickLine={false}
           axisLine={false}
           width={130}
         />
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
+            background: "#111111",
+            border: "1px solid #1f1f1f",
             borderRadius: "8px",
             fontSize: "12px",
-            color: "hsl(var(--foreground))",
+            color: "#ffffff",
           }}
           formatter={(v: number) => [`${(v * 100).toFixed(0)}%`, "Importance"]}
         />
-        <Bar dataKey="importance" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+        <Bar dataKey="importance" fill="#FF6A00" radius={[0, 4, 4, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

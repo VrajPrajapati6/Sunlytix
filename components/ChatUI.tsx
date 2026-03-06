@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Bot, User, Loader2, Sun } from "lucide-react";
 import { askAssistant } from "@/services/api";
+import { mockAssistantResponses } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -40,7 +41,7 @@ export default function ChatUI() {
       id: "welcome",
       role: "assistant",
       content:
-        "Hello! I'm the **Sunlytix AI Assistant**. I can help you analyze inverter health, predict failures, and provide maintenance recommendations.\n\nTry asking about a specific inverter or the overall plant status.",
+        "Hello! I'm the **Sunlytix AI Assistant**. I can help you analyze inverter health and provide maintenance recommendations.\n\nTry asking about a specific inverter or the overall plant status.",
       timestamp: new Date(),
     },
   ]);
@@ -67,7 +68,25 @@ export default function ChatUI() {
     setLoading(true);
 
     try {
-      const answer = await askAssistant(q);
+      // Call Groq LLM via /api/chat
+      let answer: string;
+      try {
+        answer = await askAssistant(q);
+      } catch {
+        // Fallback to mock responses if API is unavailable
+        const lowerQ = q.toLowerCase();
+        if (lowerQ.includes("risk") || lowerQ.includes("highest")) {
+          answer = mockAssistantResponses.risk;
+        } else if (lowerQ.includes("inv-21") || lowerQ.includes("degrading") || lowerQ.includes("degrad")) {
+          answer = lowerQ.includes("degrad") ? mockAssistantResponses.degrading : mockAssistantResponses["inv-21"];
+        } else if (lowerQ.includes("inspect") || lowerQ.includes("first")) {
+          answer = mockAssistantResponses.inspect;
+        } else if (lowerQ.includes("overview") || lowerQ.includes("plant")) {
+          answer = mockAssistantResponses.overview;
+        } else {
+          answer = mockAssistantResponses.default;
+        }
+      }
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -101,7 +120,7 @@ export default function ChatUI() {
           <p className="text-sm font-semibold text-foreground">Sunlytix AI Assistant</p>
           <p className="text-xs text-muted-foreground flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
-            Online — Powered by predictive ML
+            Online — Solar monitoring assistant
           </p>
         </div>
       </div>
@@ -190,7 +209,7 @@ export default function ChatUI() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Ask about inverter health, risk predictions..."
+            placeholder="Ask about inverter health, status..."
             disabled={loading}
             className="flex-1 px-4 py-3 text-sm bg-[#1A2236] border border-[#2A3448] rounded-xl outline-none focus:ring-1 focus:ring-[#4F8CFF] text-[#E6EAF2] placeholder:text-[#6B7280] disabled:opacity-50 transition-all duration-200"
           />

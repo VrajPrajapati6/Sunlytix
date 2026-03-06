@@ -4,36 +4,36 @@
 
 @layer base {
   :root, .dark {
-    --background: 223 39% 7%;
-    --foreground: 220 29% 93%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
 
-    --card: 223 35% 16%;
-    --card-foreground: 220 29% 93%;
+    --card: 0 0% 6.7%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222 35% 11%;
-    --popover-foreground: 220 29% 93%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 219 100% 65%;
-    --primary-foreground: 223 39% 7%;
+    --primary: 25 100% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 164 100% 45%;
-    --secondary-foreground: 223 39% 7%;
+    --secondary: 28 100% 65%;
+    --secondary-foreground: 0 0% 0%;
 
-    --muted: 222 35% 11%;
-    --muted-foreground: 215 14% 65%;
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 63%;
 
-    --accent: 222 32% 22%;
-    --accent-foreground: 220 29% 93%;
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 359 100% 65%;
-    --destructive-foreground: 220 29% 93%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
 
     --warning: 39 100% 56%;
-    --warning-foreground: 223 39% 7%;
+    --warning-foreground: 0 0% 0%;
 
-    --border: 220 26% 22%;
-    --input: 220 26% 22%;
-    --ring: 219 100% 65%;
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --ring: 25 100% 50%;
 
     --radius: 0.75rem;
   }
@@ -44,7 +44,7 @@
     @apply border-border;
   }
   body {
-    @apply font-sans antialiased;
+    @apply font-sans antialiased bg-black text-white;
   }
   html {
     scroll-behavior: smooth;
@@ -57,18 +57,112 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-border rounded-full;
+  background: #1f1f1f;
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground;
+  background: #333;
 }
 
-/* Smooth transitions */
-* {
-  transition-property: color, background-color, border-color, box-shadow;
-  transition-duration: 150ms;
-  transition-timing-function: ease-in-out;
+/* ─── Animated grid background ─── */
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(rgba(255, 106, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 106, 0, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ─── Glow effects ─── */
+.glow-orange {
+  box-shadow: 0 0 20px rgba(255, 106, 0, 0.15), 0 0 60px rgba(255, 106, 0, 0.05);
+}
+.glow-orange-lg {
+  box-shadow: 0 0 30px rgba(255, 106, 0, 0.2), 0 0 80px rgba(255, 106, 0, 0.08);
+}
+.glow-red {
+  box-shadow: 0 0 20px rgba(255, 60, 60, 0.2), 0 0 40px rgba(255, 60, 60, 0.08);
+}
+.glow-green {
+  box-shadow: 0 0 20px rgba(0, 229, 168, 0.15), 0 0 40px rgba(0, 229, 168, 0.06);
+}
+.text-glow-orange {
+  text-shadow: 0 0 20px rgba(255, 106, 0, 0.4);
+}
+.border-glow-orange {
+  border-color: rgba(255, 106, 0, 0.3);
+  box-shadow: 0 1px 0 0 rgba(255, 106, 0, 0.15);
+}
+
+/* ─── Pulse animation ─── */
+@keyframes pulse-orange {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-pulse-orange {
+  animation: pulse-orange 2s ease-in-out infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 60, 60, 0.4); }
+  50% { box-shadow: 0 0 15px 5px rgba(255, 60, 60, 0.15); }
+}
+.animate-pulse-red {
+  animation: pulse-red 2s ease-in-out infinite;
+}
+
+/* ─── Scanning dot animation ─── */
+@keyframes scanning {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.animate-scanning {
+  animation: scanning 1.5s ease-in-out infinite;
+}
+
+/* ─── Count-up number animation ─── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* ─── Terminal typing ─── */
+@keyframes typing {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-typing {
+  animation: typing 0.3s ease-out forwards;
+}
+
+/* ─── Timeline glow ─── */
+.timeline-glow {
+  background: linear-gradient(180deg, #FF6A00, #FF6A0033);
+}
+
+/* ─── Card 3D lift ─── */
+.card-3d {
+  transition: all 0.3s ease;
+  transform: perspective(1000px) rotateX(0deg);
+}
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(-1deg) translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 106, 0, 0.05);
+}
+
+/* ─── Glass card ─── */
+.glass-card {
+  background: rgba(17, 17, 17, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ─── Monospace terminal ─── */
+.font-mono-terminal {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 }

@@ -13,11 +13,10 @@ import {
   ShieldCheck,
   AlertCircle,
   Zap,
-  BrainCircuit,
 } from "lucide-react";
-import { TelemetryLineChart, FeatureImportanceChart } from "@/components/Charts";
+import { TelemetryLineChart } from "@/components/Charts";
 import { getInverterById, getInverterTelemetry } from "@/services/api";
-import { mockInverters, mockFeatureImportance, getMockTelemetry, type Inverter, type TelemetryPoint } from "@/lib/mockData";
+import { mockInverters, getMockTelemetry, type Inverter, type TelemetryPoint } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 
 const statusConfig = {
@@ -98,14 +97,6 @@ export default function InverterDetailPage() {
   const cfg = statusConfig[inverter.status];
   const StatusIcon = cfg.icon;
 
-  const riskPercent = Math.round(inverter.riskScore * 100);
-  const riskColor =
-    inverter.status === "High Risk"
-      ? "bg-red-500"
-      : inverter.status === "Medium Risk"
-      ? "bg-yellow-500"
-      : "bg-green-500";
-
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* breadcrumb */}
@@ -137,10 +128,8 @@ export default function InverterDetailPage() {
         </span>
       </div>
 
-      {/* Top cards: Info + Risk Prediction */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Inverter Info */}
-        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+      {/* Inverter Info */}
+      <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
           <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
             <Zap className="w-4 h-4 text-primary" />
             Inverter Info
@@ -149,6 +138,7 @@ export default function InverterDetailPage() {
             {[
               { label: "Inverter ID", value: inverter.id },
               { label: "Location", value: inverter.location },
+              { label: "Status", value: inverter.status },
               { label: "Runtime Hours", value: `${inverter.runtimeHours.toLocaleString()} hrs` },
               { label: "Last Maintenance", value: inverter.lastMaintenance },
               { label: "DC Power", value: `${inverter.DC_POWER} W` },
@@ -163,55 +153,6 @@ export default function InverterDetailPage() {
               </div>
             ))}
           </dl>
-        </div>
-
-        {/* Risk Prediction */}
-        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-            <BrainCircuit className="w-4 h-4 text-primary" />
-            AI Risk Prediction
-          </h2>
-          {/* Risk score gauge */}
-          <div className="flex flex-col items-center py-4">
-            <div className="relative w-40 h-40 flex items-center justify-center">
-              {/* Background circle */}
-              <svg className="absolute inset-0 -rotate-90" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="50" fill="none" stroke="hsl(var(--secondary))" strokeWidth="10" />
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="50"
-                  fill="none"
-                  stroke={inverter.status === "High Risk" ? "#ef4444" : inverter.status === "Medium Risk" ? "#eab308" : "#22c55e"}
-                  strokeWidth="10"
-                  strokeDasharray={`${riskPercent * 3.14} 314`}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="text-center">
-                <p className={cn("text-4xl font-black", cfg.score)}>{inverter.riskScore.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">Risk Score</p>
-              </div>
-            </div>
-          </div>
-          <dl className="space-y-3 mt-2">
-            {[
-              { label: "Risk Score", value: `${inverter.riskScore.toFixed(2)} / 1.00` },
-              { label: "Prediction Window", value: "7 Days" },
-              { label: "Model Confidence", value: "87%" },
-              { label: "MODULE_TEMPERATURE", value: `${inverter.MODULE_TEMPERATURE}°C` },
-              { label: "AMBIENT_TEMPERATURE", value: `${inverter.AMBIENT_TEMPERATURE}°C` },
-              { label: "DC_POWER", value: `${inverter.DC_POWER} W` },
-              { label: "AC_POWER", value: `${inverter.AC_POWER} W` },
-              { label: "IRRADIATION", value: `${inverter.IRRADIATION} W/m²` },
-            ].map(({ label, value }) => (
-              <div key={label} className="flex justify-between items-center">
-                <dt className="text-xs text-muted-foreground">{label}</dt>
-                <dd className="text-sm font-medium text-foreground">{value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
       </div>
 
       {/* Telemetry Charts */}
@@ -248,22 +189,6 @@ export default function InverterDetailPage() {
         <TelemetryLineChart data={telemetry} metric={activeTab} />
       </div>
 
-      {/* SHAP Explainability */}
-      <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
-        <div className="mb-4">
-          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <BrainCircuit className="w-4 h-4 text-primary" />
-            AI Explainability — Feature Importance
-          </h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            SHAP analysis showing which factors contribute most to the risk score for {inverter.id}
-          </p>
-        </div>
-        <FeatureImportanceChart data={mockFeatureImportance} />
-        <p className="text-xs text-muted-foreground mt-3 italic">
-          * Feature importance is simulated using SHAP values from the predictive ML model.
-        </p>
-      </div>
     </div>
   );
 }
