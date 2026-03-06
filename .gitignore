@@ -48,6 +48,11 @@ __pycache__/
 solar_ml_master_dataset/
 solar_processed_dataset/
 
+# Model artifacts (large binary files)
+*.pkl
+*.bin
+*.faiss
+
 # Temp logs
 *.log
 build_log.txt
