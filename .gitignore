@@ -35,4 +35,19 @@ next-env.d.ts
 .DS_Store
 Thumbs.db
 
-/lib/generated/prisma
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+
+# Large dataset files (store outside the repo)
+*.xlsx
+*.csv
+solar_ml_master_dataset/
+
+# Temp logs
+*.log
+build_log.txt
+dev_log.txt
