@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { BrainCircuit, Activity, Filter } from "lucide-react";
 import InsightCard from "@/components/InsightCard";
 import { getInsights } from "@/services/api";
-import { type Insight } from "@/lib/mockData";
+import { mockInsights, type Insight } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | "high" | "medium" | "low";
@@ -15,10 +15,13 @@ export default function InsightsPage() {
   const [filter, setFilter] = useState<Filter>("all");
 
   useEffect(() => {
-    getInsights().then((data) => {
-      setInsights(data);
-      setLoading(false);
-    });
+    getInsights()
+      .then((data) => setInsights(data.length > 0 ? data : mockInsights))
+      .catch(() => {
+        console.warn("API unavailable — using mock data");
+        setInsights(mockInsights);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = filter === "all" ? insights : insights.filter((i) => i.severity === filter);

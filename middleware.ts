@@ -2,14 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(req: NextRequest) {
-    // Redirect root path to dashboard
-    if (req.nextUrl.pathname === '/') {
-        return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
-
+    // Root path now shows the landing page — no redirect needed
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ['/'],
+    // Only match paths that need middleware processing
+    matcher: [],
 };

@@ -4,17 +4,20 @@ import { useEffect, useState } from "react";
 import { Zap, Activity } from "lucide-react";
 import InverterTable from "@/components/InverterTable";
 import { getInverters } from "@/services/api";
-import { type Inverter } from "@/lib/mockData";
+import { mockInverters, type Inverter } from "@/lib/mockData";
 
 export default function InvertersPage() {
   const [inverters, setInverters] = useState<Inverter[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getInverters().then((data) => {
-      setInverters(data);
-      setLoading(false);
-    });
+    getInverters()
+      .then((data) => setInverters(data.length > 0 ? data : mockInverters))
+      .catch(() => {
+        console.warn("API unavailable — using mock data");
+        setInverters(mockInverters);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const healthy = inverters.filter((i) => i.status === "Healthy").length;

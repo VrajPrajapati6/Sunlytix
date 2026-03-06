@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { TelemetryLineChart, FeatureImportanceChart } from "@/components/Charts";
 import { getInverterById, getInverterTelemetry } from "@/services/api";
-import { mockFeatureImportance, type Inverter, type TelemetryPoint } from "@/lib/mockData";
+import { mockInverters, mockFeatureImportance, getMockTelemetry, type Inverter, type TelemetryPoint } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 
 const statusConfig = {
@@ -55,11 +55,18 @@ export default function InverterDetailPage() {
   const [activeTab, setActiveTab] = useState<"MODULE_TEMPERATURE" | "AC_POWER" | "DC_POWER" | "IRRADIATION" | "AMBIENT_TEMPERATURE">("MODULE_TEMPERATURE");
 
   useEffect(() => {
-    Promise.all([getInverterById(id), getInverterTelemetry(id)]).then(([inv, tel]) => {
-      setInverter(inv);
-      setTelemetry(tel);
-      setLoading(false);
-    });
+    Promise.all([getInverterById(id), getInverterTelemetry(id)])
+      .then(([inv, tel]) => {
+        setInverter(inv);
+        setTelemetry(tel);
+      })
+      .catch(() => {
+        console.warn("API unavailable — using mock data");
+        const mock = mockInverters.find((i) => i.id === id) || mockInverters[0];
+        setInverter(mock);
+        setTelemetry(getMockTelemetry(id));
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) {

@@ -5,17 +5,22 @@ import { Zap, ShieldCheck, AlertTriangle, AlertCircle, Activity } from "lucide-r
 import MetricCard from "@/components/MetricCard";
 import { RiskDistributionChart, PowerTrendChart, TempTrendChart } from "@/components/Charts";
 import { getInverters } from "@/services/api";
-import { mockPowerTrend, mockTempTrend, type Inverter } from "@/lib/mockData";
+import { mockInverters, mockPowerTrend, mockTempTrend, type Inverter } from "@/lib/mockData";
 
 export default function DashboardPage() {
   const [inverters, setInverters] = useState<Inverter[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getInverters().then((data) => {
-      setInverters(data);
-      setLoading(false);
-    });
+    getInverters()
+      .then((data) => {
+        setInverters(data.length > 0 ? data : mockInverters);
+      })
+      .catch(() => {
+        console.warn("API unavailable — using mock data");
+        setInverters(mockInverters);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const healthy = inverters.filter((i) => i.status === "Healthy").length;

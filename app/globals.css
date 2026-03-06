@@ -44,7 +44,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply font-sans antialiased;
+  }
+  html {
+    scroll-behavior: smooth;
   }
 }
 
