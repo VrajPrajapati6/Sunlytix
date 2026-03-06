@@ -4,6 +4,7 @@ Serves the RandomForestClassifier model for inverter failure prediction.
 """
 
 import os
+import sys
 import joblib
 import numpy as np
 import pandas as pd
@@ -12,15 +13,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional
 
-# ── Load model artefacts ───────────────────────────────────────────────────────
+# ── Register FeatureGenerator so the pickle can deserialise ────────────────────
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, BASE_DIR)
+from models.feature_generator import FeatureGenerator           # noqa: E402
+sys.modules["__main__"].FeatureGenerator = FeatureGenerator     # needed by joblib
+
+# ── Load model artefacts ───────────────────────────────────────────────────────
 MODEL_PATH   = os.path.join(BASE_DIR, "models", "model.pkl")
 SCALER_PATH  = os.path.join(BASE_DIR, "models", "scaler.pkl")
 COLUMNS_PATH = os.path.join(BASE_DIR, "models", "feature_columns.pkl")
+FG_PATH      = os.path.join(BASE_DIR, "models", "feature_generator.pkl")
 
-MODEL   = joblib.load(MODEL_PATH)
-SCALER  = joblib.load(SCALER_PATH)
+MODEL           = joblib.load(MODEL_PATH)
+SCALER          = joblib.load(SCALER_PATH)
 FEATURE_COLUMNS = joblib.load(COLUMNS_PATH)   # list of 41 feature names
+FEATURE_GEN     = joblib.load(FG_PATH)        # FeatureGenerator transformer
 
 app = FastAPI(title="Sunlytix Prediction API", version="1.0.0")
 
@@ -99,26 +107,14 @@ def risk_to_status(score: float) -> str:
     return "critical"
 
 
-def derive_engineered(req: PredictRequest) -> PredictRequest:
-    """
-    Auto-derive engineered features if caller passed zeros.
-    This lets the DB seed (which stores raw values) work correctly.
-    """
-    r = req.model_copy()
-    denom_vc  = r.pv1_current if r.pv1_current != 0 else 1e-9
-    denom_gpr = r.inverter_power if r.inverter_power != 0 else 1e-9
-
-    r.pv1_power_calc           = r.pv1_voltage * r.pv1_current
-    r.pv2_power_calc           = r.pv2_voltage * r.pv2_current
-    r.voltage_current_ratio    = r.pv1_voltage / denom_vc
-    r.power_efficiency         = r.efficiency
-    r.grid_power_ratio         = r.grid_power / denom_gpr
-    r.temp_diff_calc           = r.inverter_temp - r.ambient_temperature
-    r.temp_voltage_interaction = r.inverter_temp * r.pv1_voltage
-    r.pv1_current_sq           = r.pv1_current ** 2
-    r.pv1_voltage_sq           = r.pv1_voltage ** 2
-    r.freq_deviation           = abs(r.grid_frequency - 50.0)
-    return r
+def build_feature_df(req: PredictRequest) -> pd.DataFrame:
+    """Convert request to DataFrame, run FeatureGenerator, return ordered df."""
+    # Build raw row from request fields
+    raw = {col: getattr(req, col, 0.0) for col in FEATURE_COLUMNS}
+    df_raw = pd.DataFrame([raw])
+    # Run the actual FeatureGenerator transformer (same pipeline used at training)
+    df_full = FEATURE_GEN.transform(df_raw)
+    return df_full[FEATURE_COLUMNS]
 
 
 # ── Routes ─────────────────────────────────────────────────────────────────────
@@ -133,11 +129,8 @@ def health():
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(req: PredictRequest):
-    req = derive_engineered(req)
-
-    # Build feature vector in the exact column order
-    row = {col: getattr(req, col, 0.0) for col in FEATURE_COLUMNS}
-    df  = pd.DataFrame([row])[FEATURE_COLUMNS]
+    # Build feature df using the loaded FeatureGenerator transformer
+    df = build_feature_df(req)
 
     # Scale
     X_scaled = SCALER.transform(df)
