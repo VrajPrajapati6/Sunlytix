@@ -46,6 +46,7 @@ __pycache__/
 *.xlsx
 *.csv
 solar_ml_master_dataset/
+solar_processed_dataset/
 
 # Temp logs
 *.log
