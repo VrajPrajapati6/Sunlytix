@@ -5,8 +5,6 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Bell,
-  Sun,
-  Moon,
   User,
   LogOut,
   Settings as SettingsIcon,
@@ -33,7 +31,6 @@ const navItems = [
 export default function DashboardHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const [darkMode, setDarkMode] = useState(true);
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -58,15 +55,10 @@ export default function DashboardHeader() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  function toggleDark() {
-    setDarkMode((d) => !d);
-    document.documentElement.classList.toggle("dark");
-  }
-
   async function handleLogout() {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/login");
+      router.push("/");
       router.refresh();
     } catch (error) {
       console.error("Logout failed:", error);
@@ -128,15 +120,6 @@ export default function DashboardHeader() {
 
         {/* Right — Actions */}
         <div className="flex items-center gap-1.5">
-          {/* Theme toggle */}
-          <button
-            onClick={toggleDark}
-            className="p-2 rounded-lg hover:bg-white/5 transition-colors text-[#A0A0A0] hover:text-white"
-            aria-label="Toggle theme"
-          >
-            {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-
           {/* Notifications */}
           <div className="relative" ref={notifRef}>
             <button

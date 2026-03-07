@@ -12,12 +12,14 @@ import {
   Terminal,
   TrendingUp,
   Clock,
-  Lightbulb,
   Gauge,
+  Upload,
+  CheckCircle,
+  FileSpreadsheet,
 } from "lucide-react";
 import { RiskDistributionChart, PowerTrendChart, TempTrendChart } from "@/components/Charts";
 import { getInverters } from "@/services/api";
-import { mockInverters, mockPowerTrend, mockTempTrend, mockInsights, type Inverter } from "@/lib/mockData";
+import { mockInverters, mockPowerTrend, mockTempTrend, type Inverter } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 
 /* ─── Animated Counter ─── */
@@ -300,52 +302,68 @@ function MonitoringTerminal() {
   );
 }
 
-/* ─── AI Insights Panel ─── */
-function InsightsPanel() {
-  const topInsights = mockInsights.filter((i) => i.severity !== "low").slice(0, 3);
+/* ─── CSV Upload Panel ─── */
+function CSVUploadPanel() {
+  const [uploadMsg, setUploadMsg] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadMsg(`Processing "${file.name}"…`);
+    setTimeout(() => {
+      setUploading(false);
+      setUploadMsg(`✓ "${file.name}" uploaded — ${(file.size / 1024).toFixed(1)} KB`);
+    }, 1500);
+    // Reset input so same file can be re-selected
+    e.target.value = "";
+  }
 
   return (
-    <div className="space-y-3">
-      {topInsights.map((insight) => (
-        <div
-          key={insight.id}
-          className={cn(
-            "rounded-lg border p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg",
-            insight.severity === "high"
-              ? "border-red-500/30 bg-red-500/5"
-              : "border-[#FF6A00]/20 bg-[#FF6A00]/5"
-          )}
-        >
-          <div className="flex items-start gap-3">
-            <div className={cn(
-              "p-1.5 rounded-lg flex-shrink-0 mt-0.5",
-              insight.severity === "high" ? "bg-red-500/15" : "bg-[#FF6A00]/15"
-            )}>
-              <Lightbulb className={cn("w-4 h-4", insight.severity === "high" ? "text-red-400" : "text-[#FF6A00]")} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-white">{insight.title}</p>
-                <span className={cn(
-                  "text-[9px] px-1.5 py-0.5 rounded-full font-medium uppercase",
-                  insight.severity === "high" ? "bg-red-500/15 text-red-400" : "bg-[#FF6A00]/15 text-[#FF6A00]"
-                )}>
-                  {insight.severity}
-                </span>
-              </div>
-              <p className="text-xs text-[#A0A0A0] mt-1 leading-relaxed">{insight.description}</p>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-[10px] px-2 py-0.5 rounded bg-[#1f1f1f] text-[#FF6A00] font-medium">
-                  {insight.inverterId}
-                </span>
-                <span className="text-[10px] text-[#555]">
-                  {new Date(insight.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                </span>
-              </div>
-            </div>
-          </div>
+    <div className="space-y-4">
+      <label
+        className="block rounded-xl border-2 border-dashed border-[#2A3448] bg-[#0a0a0a] p-6 text-center hover:border-[#FF6A00]/50 hover:bg-[#FF6A00]/5 transition-all cursor-pointer group"
+      >
+        <Upload className="w-8 h-8 text-[#555] mx-auto mb-3 group-hover:text-[#FF6A00] transition-colors" />
+        <p className="text-sm font-medium text-white">Drop CSV file here or click to browse</p>
+        <p className="text-xs text-[#6B7280] mt-1">
+          inverter_id · timestamp · temperature · efficiency · power_output · voltage
+        </p>
+        <span className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#FF6A00] text-white rounded-lg text-xs font-semibold hover:bg-[#e85d00] transition-colors">
+          <Upload className="w-3.5 h-3.5" />
+          Upload Telemetry CSV
+        </span>
+        <input
+          type="file"
+          accept=".csv"
+          className="hidden"
+          onChange={handleFileUpload}
+        />
+      </label>
+
+      {uploadMsg && (
+        <div className={cn(
+          "flex items-center gap-2 text-xs px-3 py-2.5 rounded-lg border",
+          uploading
+            ? "bg-[#FF6A00]/5 border-[#FF6A00]/20 text-[#FF6A00]"
+            : "bg-emerald-500/5 border-emerald-500/20 text-emerald-400"
+        )}>
+          {uploading
+            ? <Activity className="w-4 h-4 animate-spin flex-shrink-0" />
+            : <CheckCircle className="w-4 h-4 flex-shrink-0" />
+          }
+          {uploadMsg}
         </div>
-      ))}
+      )}
+
+      <div className="bg-[#0a0a0a] border border-[#1A1A1A] rounded-lg p-3">
+        <p className="text-[11px] font-semibold text-[#A0A0A0] uppercase tracking-wider mb-1.5">Expected columns</p>
+        <code className="text-[11px] text-[#6B7280] font-mono leading-relaxed">
+          inverter_id, timestamp, temperature, efficiency,<br />
+          power_output, voltage, current, alarm_count
+        </code>
+      </div>
     </div>
   );
 }
@@ -471,7 +489,7 @@ export default function DashboardPage() {
         <PredictionTimeline inverters={inverters} />
       </div>
 
-      {/* ─── Terminal + Insights ─── */}
+      {/* ─── Terminal + CSV Upload ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="glass-card rounded-xl border border-[#1f1f1f] p-5">
           <div className="flex items-center gap-2 mb-3">
@@ -482,11 +500,11 @@ export default function DashboardPage() {
         </div>
         <div className="glass-card rounded-xl border border-[#1f1f1f] p-5">
           <div className="flex items-center gap-2 mb-1">
-            <Lightbulb className="w-4 h-4 text-[#FF6A00]" />
-            <h2 className="text-sm font-semibold text-white">AI Insights & Recommendations</h2>
+            <FileSpreadsheet className="w-4 h-4 text-[#FF6A00]" />
+            <h2 className="text-sm font-semibold text-white">Upload Telemetry Data</h2>
           </div>
-          <p className="text-xs text-[#666] mb-3">AI-generated maintenance recommendations</p>
-          <InsightsPanel />
+          <p className="text-xs text-[#666] mb-4">Import historical inverter data via CSV</p>
+          <CSVUploadPanel />
         </div>
       </div>
 
