@@ -44,7 +44,7 @@ export default function DashboardHeader() {
   useEffect(() => {
     fetch("/api/auth/me")
       .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setUser(data))
+      .then((data) => setUser(data?.user || null))
       .catch(() => setUser(null));
   }, []);
 
@@ -202,6 +202,13 @@ export default function DashboardHeader() {
                   <p className="text-xs text-[#A0A0A0] truncate">{user?.email || "operator@sunlytix.com"}</p>
                 </div>
                 <div className="p-1.5">
+                  <button
+                    onClick={() => { setProfileOpen(false); router.push("/profile"); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-[#A0A0A0] hover:text-white hover:bg-white/5 transition-all"
+                  >
+                    <User className="w-4 h-4" />
+                    My Profile
+                  </button>
                   <button
                     onClick={() => { setProfileOpen(false); router.push("/settings"); }}
                     className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-[#A0A0A0] hover:text-white hover:bg-white/5 transition-all"
