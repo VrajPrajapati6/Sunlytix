@@ -375,6 +375,17 @@ function CSVUploadPanel() {
 export default function DashboardPage() {
   const [inverters, setInverters] = useState<Inverter[]>([]);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{ show: boolean; message: string }>({ show: false, message: "" });
+
+  function showToast(message: string) {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+  }
+
+  function clearData() {
+    setInverters([]);
+    showToast("Dashboard data cleared");
+  }
 
   useEffect(() => {
     getInverters()
@@ -427,11 +438,24 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3 text-xs text-[#666]">
           <span className="flex items-center gap-1.5"><Gauge className="w-3.5 h-3.5" /> {(totalPower / 1000).toFixed(1)} kW total</span>
           <span className="flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> {totalEnergyToday.toFixed(1)} kWh today</span>
-          <span className="flex items-center gap-1.5"><Thermometer className="w-3.5 h-3.5" /> {avgTemp.toFixed(0)}°C avg</span>
-        </div>
+          <span className="flex items-center gap-1.5"><Thermometer className="w-3.5 h-3.5" /> {avgTemp.toFixed(0)}°C avg</span>          <button
+            onClick={clearData}
+            className="ml-4 px-3 py-1 bg-red-600 text-white rounded-md text-xs hover:bg-red-500 transition-colors"
+          >
+            Clear Data
+          </button>        </div>
       </div>
 
       {/* ─── KPI Summary Cards ─── */}
+
+      {/* Toast */}
+      {toast.show && (
+        <div className="fixed bottom-6 right-6 z-50 bg-foreground text-background px-4 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-bottom-4">
+          <CheckCircle className="w-4 h-4" />
+          {toast.message}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard icon={Zap} title="Total Inverters" value={total} subtitle="Across 3 plants" color="blue" delay={0} />
         <KPICard icon={ShieldCheck} title="Healthy" value={healthy} subtitle="Operating normally" color="green" delay={100} />

@@ -291,14 +291,17 @@ export default function SettingsPage() {
               <button
                 onClick={() => setNotifications((n) => ({ ...n, [key]: !n[key] }))}
                 className={cn(
-                  "relative w-10 h-5 rounded-full transition-colors",
+                  // ensure thumb never escapes the rounded track
+                  "relative w-10 h-5 rounded-full transition-colors overflow-hidden",
                   notifications[key] ? "bg-primary" : "bg-secondary border border-border"
                 )}
               >
                 <span
                   className={cn(
-                    "absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform",
-                    notifications[key] ? "translate-x-5" : "translate-x-0.5"
+                    // position the thumb explicitly and centre it vertically
+                    "absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform",
+                    // move from 0 to full width minus thumb
+                    notifications[key] ? "translate-x-5" : "translate-x-0"
                   )}
                 />
               </button>
