@@ -74,29 +74,29 @@ export default function DashboardHeader() {
   const severityDot = {
     high: "bg-red-500",
     medium: "bg-[#FF6A00]",
-    low: "bg-blue-500",
+    low: "bg-gray-500",
   };
 
   return (
     <>
-      <header className="h-16 bg-black border-b border-glow-orange flex items-center justify-between px-4 lg:px-6 shrink-0 relative z-50">
-        {/* Left — Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2.5 flex-shrink-0">
+      <header className="h-20 bg-black/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-8 lg:px-12 shrink-0 relative z-50">
+        {/* Left — Logo (Matched Landing Page) */}
+        <Link href="/dashboard" className="flex items-center gap-3 flex-shrink-0 transition-opacity hover:opacity-90">
           <Image
             src="/favicon.png"
             alt="Sunlytix Logo"
-            width={36}
-            height={36}
-            className="rounded-lg"
+            width={44}
+            height={44}
+            className="rounded-lg shadow-[0_0_15px_rgba(255,106,0,0.2)]"
           />
-          <div className="hidden sm:block">
-            <p className="font-bold text-sm text-white leading-tight tracking-tight">Sunlytix</p>
-            <p className="text-[10px] text-[#A0A0A0] leading-tight">Predict. Prevent. Power the Sun.</p>
+          <div className="hidden sm:flex flex-col">
+            <span className="text-white font-bold text-2xl leading-tight tracking-tight">Sunlytix</span>
+            <span className="text-[10px] text-gray-500 leading-tight">Predict. Prevent. Power the Sun.</span>
           </div>
         </Link>
 
-        {/* Center — Navigation (desktop) */}
-        <nav className="hidden md:flex items-center gap-1">
+        {/* Center — Navigation (Redesigned with glowing active state) */}
+        <nav className="hidden md:flex items-center gap-2">
           {navItems.map(({ href, label, icon: Icon }) => {
             const isActive = pathname === href || pathname.startsWith(href + "/");
             return (
@@ -104,14 +104,17 @@ export default function DashboardHeader() {
                 key={href}
                 href={href}
                 className={cn(
-                  "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                  "flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 relative group",
                   isActive
-                    ? "bg-[#FF6A00]/15 text-[#FF6A00] shadow-[0_0_15px_rgba(255,106,0,0.15)]"
-                    : "text-[#A0A0A0] hover:text-white hover:bg-white/5"
+                    ? "bg-orange-500 text-white shadow-[0_0_20px_rgba(255,106,0,0.3)]"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
                 )}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className={cn("w-4 h-4", isActive ? "text-white" : "group-hover:text-orange-400 transition-colors")} />
                 <span>{label}</span>
+                {!isActive && (
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-orange-500 rounded-full transition-all group-hover:w-1/2" />
+                )}
               </Link>
             );
           })}

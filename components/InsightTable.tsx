@@ -11,16 +11,16 @@ interface InsightTableProps {
 
 const severityConfig = {
   high: {
-    badge: "bg-[#FF4D4F]/20 text-[#FF4D4F]",
+    badge: "bg-orange-500/20 text-orange-500 border border-orange-500/30",
     label: "High Risk",
   },
   medium: {
-    badge: "bg-[#FFB020]/20 text-[#FFB020]",
+    badge: "bg-orange-500/10 text-orange-400 border border-orange-500/20",
     label: "Medium Risk",
   },
   low: {
-    badge: "bg-primary/20 text-primary",
-    label: "Low Priority",
+    badge: "bg-white/5 text-gray-400 border border-white/10",
+    label: "Healthy",
   },
 };
 
@@ -76,9 +76,9 @@ function InsightRow({ insight, index }: { insight: Insight; index: number }) {
         onClick={toggleExpand}
         className={cn(
           "border-b border-border last:border-0 transition-colors",
-          canAnalyze ? "cursor-pointer hover:bg-secondary/60" : "hover:bg-secondary/40",
-          index % 2 === 0 ? "bg-transparent" : "bg-secondary/20",
-          isExpanded ? "bg-secondary/30" : ""
+          canAnalyze ? "cursor-pointer hover:bg-white/10" : "hover:bg-white/[0.05]",
+          index % 2 === 0 ? "bg-transparent" : "bg-white/[0.02]",
+          isExpanded ? "bg-white/[0.03]" : ""
         )}
       >
         <td className="px-4 py-3 font-semibold text-foreground max-w-[200px] truncate" title={insight.title}>
@@ -112,10 +112,10 @@ function InsightRow({ insight, index }: { insight: Insight; index: number }) {
       {isExpanded && canAnalyze && (
         <tr className={cn(
           "border-b border-border",
-          index % 2 === 0 ? "bg-transparent" : "bg-secondary/20"
+          index % 2 === 0 ? "bg-transparent" : "bg-white/[0.02]"
         )}>
           <td colSpan={6} className="p-0">
-            <div className="px-6 py-4 bg-secondary/10 border-t border-border/50 shadow-inner">
+            <div className="px-6 py-4 bg-white/[0.01] border-t border-white/5 shadow-inner">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-4 h-4 text-primary animate-pulse" />
                 <h4 className="text-sm font-bold text-foreground">AI Root Cause Analysis (RAG)</h4>
@@ -127,7 +127,7 @@ function InsightRow({ insight, index }: { insight: Insight; index: number }) {
                   <span className="font-medium">Querying Knowledge Base...</span>
                 </div>
               ) : error ? (
-                <div className="text-sm text-red-500 p-4 bg-red-500/10 rounded-lg border border-red-500/20 max-w-2xl">
+                <div className="text-sm text-orange-500 p-4 bg-orange-500/10 rounded-lg border border-orange-500/20 max-w-2xl">
                   Failed to analyze: {error}
                 </div>
               ) : analysisResult ? (
@@ -233,7 +233,7 @@ export default function InsightTable({ insights }: InsightTableProps) {
             placeholder="Search insights..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-secondary/50 border border-border rounded-lg outline-none focus:ring-1 focus:ring-primary focus:border-primary text-foreground placeholder:text-muted-foreground transition-all duration-200"
+            className="w-full pl-9 pr-4 py-2 text-sm bg-white/5 border border-white/10 rounded-lg outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-white placeholder:text-gray-500 transition-all duration-200"
           />
         </div>
         <p className="text-xs text-muted-foreground mt-2">
@@ -245,7 +245,7 @@ export default function InsightTable({ insights }: InsightTableProps) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-secondary/50">
+            <tr className="border-b border-border bg-white/[0.02]">
               <th
                 className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide cursor-pointer select-none"
                 onClick={() => handleSort("title")}

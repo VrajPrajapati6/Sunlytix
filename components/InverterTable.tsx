@@ -11,15 +11,15 @@ interface InverterTableProps {
 }
 
 const statusStyles: Record<InverterStatus, string> = {
-  Healthy: "bg-[#00E5A8]/20 text-[#00E5A8]",
-  "Medium Risk": "bg-[#FFB020]/20 text-[#FFB020]",
-  "High Risk": "bg-[#FF4D4F]/20 text-[#FF4D4F]",
+  Healthy: "bg-white/5 border border-white/10 text-gray-400 font-medium",
+  "Medium Risk": "bg-orange-500/10 border border-orange-500/20 text-orange-400 font-medium",
+  "High Risk": "bg-orange-500/20 border border-orange-500/30 text-orange-500 font-medium",
 };
 
 const riskBarColor: Record<InverterStatus, string> = {
-  Healthy: "bg-[#00E5A8]",
-  "Medium Risk": "bg-[#FFB020]",
-  "High Risk": "bg-[#FF4D4F]",
+  Healthy: "bg-gray-500",
+  "Medium Risk": "bg-orange-400",
+  "High Risk": "bg-orange-500",
 };
 
 type SortField = keyof Pick<Inverter, "id" | "mac" | "location" | "MODULE_TEMPERATURE" | "DC_POWER" | "AC_POWER" | "riskScore">;
@@ -77,7 +77,7 @@ export default function InverterTable({ inverters }: InverterTableProps) {
             placeholder="Search inverters..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-secondary/50 border border-border rounded-lg outline-none focus:ring-1 focus:ring-primary focus:border-primary text-foreground placeholder:text-muted-foreground transition-all duration-200"
+            className="w-full pl-9 pr-4 py-2 text-sm bg-white/5 border border-white/10 rounded-lg outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-white placeholder:text-gray-500 transition-all duration-200"
           />
         </div>
         <p className="text-xs text-muted-foreground mt-2">
@@ -89,7 +89,7 @@ export default function InverterTable({ inverters }: InverterTableProps) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-secondary/50">
+            <tr className="border-b border-border bg-white/[0.02]">
               {(
                 [
                   { field: "id", label: "Inverter ID" },
@@ -123,8 +123,8 @@ export default function InverterTable({ inverters }: InverterTableProps) {
                 key={inv.id}
                 onClick={() => router.push(`/inverters/${inv.id}`)}
                 className={cn(
-                  "border-b border-border last:border-0 cursor-pointer transition-colors hover:bg-secondary/60",
-                  idx % 2 === 0 ? "bg-transparent" : "bg-secondary/20"
+                  "border-b border-border last:border-0 cursor-pointer transition-colors hover:bg-white/10",
+                  idx % 2 === 0 ? "bg-transparent" : "bg-white/[0.02]"
                 )}
               >
                 <td className="px-4 py-3 font-semibold text-foreground">{inv.id}</td>
@@ -134,9 +134,9 @@ export default function InverterTable({ inverters }: InverterTableProps) {
                     className={cn(
                       "font-medium",
                       inv.MODULE_TEMPERATURE >= 65
-                        ? "text-[#FF4D4F]"
+                        ? "text-orange-500"
                         : inv.MODULE_TEMPERATURE >= 50
-                          ? "text-[#FFB020]"
+                          ? "text-orange-400"
                           : "text-foreground"
                     )}
                   >
@@ -148,7 +148,7 @@ export default function InverterTable({ inverters }: InverterTableProps) {
                 <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{inv.mac || "-"}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-20 h-1.5 bg-secondary rounded-full overflow-hidden">
+                    <div className="w-20 h-1.5 bg-white/10 rounded-full overflow-hidden">
                       <div
                         className={cn("h-full rounded-full", riskBarColor[inv.status])}
                         style={{ width: `${inv.riskScore * 100}%` }}

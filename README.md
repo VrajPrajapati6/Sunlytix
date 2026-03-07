@@ -2,6 +2,13 @@
 
 > **Predict. Prevent. Power the Sun.**
 
+Team Members:
+- Vraj Prajapati - vrajprajapati6004@gmail.com
+- Prince Shah - 2406prince2006@gmail.com
+- Trupal Dholariya - dholariyatrupal06@gmail.com
+- Niyati Navadiya - 
+- Tanish Solanki - solankitanish2007@gmail.com
+
 Sunlytix is an AI-powered platform that predicts solar inverter failures 7–10 days in advance and provides natural language operational guidance to plant operators.
 
 ![Architecture](docs/architecture-diagram.png)

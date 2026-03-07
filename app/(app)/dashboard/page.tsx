@@ -56,29 +56,36 @@ function AIStatusBar({ total, alerts }: { total: number; alerts: number }) {
   }, []);
 
   return (
-    <div className="w-full bg-[#0a0a0a] border border-[#1f1f1f] rounded-xl px-5 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-      <div className="flex items-center gap-3">
-        <div className="w-2 h-2 rounded-full bg-[#FF6A00] animate-pulse-orange" />
-        <p className="text-sm text-[#A0A0A0]">
-          <span className="text-white font-medium">Sunlytix AI</span> monitoring active —{" "}
-          <span className="text-[#FF6A00]">{total} inverters</span> scanned —{" "}
-          <span className="text-red-400">{alerts} alerts detected</span>
+    <div className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-6 py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_0_20px_rgba(255,106,0,0.02)] backdrop-blur-sm">
+      <div className="flex items-center gap-4">
+        <div className="relative">
+          <div className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
+          <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping opacity-40" />
+        </div>
+        <p className="text-sm text-gray-400">
+          <span className="text-white font-bold tracking-tight">Sunlytix AI</span> monitoring active —{" "}
+          <span className="text-orange-500 font-semibold">{total} inverters</span> scanned —{" "}
+          <span className="text-red-400 font-semibold">{alerts} alerts detected</span>
         </p>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
         {plants.map((plant, i) => (
-          <div key={plant} className="flex items-center gap-1.5">
+          <div key={plant} className="flex items-center gap-2">
             <div
               className={cn(
-                "w-1.5 h-1.5 rounded-full transition-all duration-500",
-                i === activeIdx ? "bg-[#FF6A00] animate-scanning scale-125" : "bg-[#333]"
+                "w-1.5 h-1.5 rounded-full transition-all duration-700",
+                i === activeIdx ? "bg-orange-500 shadow-[0_0_8px_rgba(255,106,0,0.6)] scale-125" : "bg-white/10"
               )}
             />
-            <span className={cn("text-xs transition-colors duration-300", i === activeIdx ? "text-[#FF6A00]" : "text-[#555]")}>
+            <span className={cn("text-[11px] font-medium uppercase tracking-widest transition-colors duration-500", i === activeIdx ? "text-orange-400" : "text-gray-600")}>
               {plant}
             </span>
           </div>
         ))}
+        <div className="h-4 w-px bg-white/10 hidden sm:block mx-2" />
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] text-gray-500 font-mono">SCANNING...</span>
+        </div>
       </div>
     </div>
   );
@@ -101,30 +108,46 @@ function KPICard({
   delay?: number;
 }) {
   const colorMap: Record<string, { bg: string; text: string; glow: string; border: string }> = {
-    blue: { bg: "bg-blue-500/10", text: "text-blue-400", glow: "shadow-[0_0_20px_rgba(59,130,246,0.15)]", border: "border-blue-500/20" },
-    green: { bg: "bg-emerald-500/10", text: "text-emerald-400", glow: "shadow-[0_0_20px_rgba(16,185,129,0.15)]", border: "border-emerald-500/20" },
-    orange: { bg: "bg-[#FF6A00]/10", text: "text-[#FF6A00]", glow: "shadow-[0_0_20px_rgba(255,106,0,0.15)]", border: "border-[#FF6A00]/20" },
-    red: { bg: "bg-red-500/10", text: "text-red-400", glow: "shadow-[0_0_20px_rgba(239,68,68,0.15)]", border: "border-red-500/20" },
+    green: { bg: "bg-emerald-500/10", text: "text-emerald-400", glow: "shadow-[0_0_30px_rgba(16,185,129,0.08)]", border: "border-emerald-500/20" },
+    orange: { bg: "bg-orange-500/10", text: "text-orange-500", glow: "shadow-[0_0_30px_rgba(255,106,0,0.1)]", border: "border-orange-500/20" },
+    red: { bg: "bg-red-500/10", text: "text-red-500", glow: "shadow-[0_0_30px_rgba(239,68,68,0.1)]", border: "border-red-500/20" },
+    white: { bg: "bg-white/5", text: "text-white", glow: "shadow-[0_0_30px_rgba(255,255,255,0.02)]", border: "border-white/10" },
   };
-  const c = colorMap[color] ?? colorMap.blue;
+  const c = colorMap[color] ?? colorMap.white;
 
   return (
     <div
-      className={cn("glass-card card-3d rounded-xl p-5 border", c.border, c.glow, "animate-slide-up")}
+      className={cn(
+        "group relative overflow-hidden rounded-2xl border bg-white/[0.03] p-6 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl backdrop-blur-md",
+        c.border,
+        c.glow,
+        "animate-slide-up"
+      )}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-semibold text-[#A0A0A0] uppercase tracking-wider">{title}</p>
-          <p className={cn("text-4xl font-bold mt-2", c.text)}>
-            <AnimatedNumber value={value} />
+      {/* Decorative background glow */}
+      <div className={cn("absolute -right-4 -top-4 w-24 h-24 blur-3xl rounded-full opacity-10 transition-opacity group-hover:opacity-20", c.bg)} />
+
+      <div className="flex items-start justify-between relative z-10">
+        <div className="space-y-3">
+          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">{title}</p>
+          <div className="flex items-baseline gap-1">
+            <h3 className={cn("text-4xl font-bold tracking-tight", c.text)}>
+              <AnimatedNumber value={value} />
+            </h3>
+          </div>
+          <p className="text-xs text-gray-400 font-medium flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
+            <span className="w-1 h-1 rounded-full bg-gray-600" />
+            {subtitle}
           </p>
-          <p className="text-xs text-[#666] mt-1.5">{subtitle}</p>
         </div>
-        <div className={cn("p-2.5 rounded-lg", c.bg)}>
-          <Icon className={cn("w-5 h-5", c.text)} />
+        <div className={cn("p-3 rounded-xl border border-white/5 shadow-inner transition-transform group-hover:scale-110 duration-500", c.bg)}>
+          <Icon className={cn("w-6 h-6", c.text)} />
         </div>
       </div>
+      
+      {/* Bottom accent line */}
+      <div className={cn("absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r from-transparent via-current to-transparent transition-all duration-700 group-hover:w-full opacity-30", c.text)} />
     </div>
   );
 }
@@ -134,48 +157,73 @@ function PlantHeatmap({ inverters }: { inverters: Inverter[] }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const plants = ["Plant 1", "Plant 2", "Plant 3"];
 
-  const getColor = (status: string) => {
-    if (status === "High Risk") return "bg-red-500/80 border-red-500/50 animate-pulse-red";
-    if (status === "Medium Risk") return "bg-[#FF6A00]/60 border-[#FF6A00]/40";
-    return "bg-emerald-500/50 border-emerald-500/30";
+  const getStatusStyles = (status: string) => {
+    if (status === "High Risk") return "bg-red-500/20 border-red-500/40 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)] animate-pulse";
+    if (status === "Medium Risk") return "bg-orange-500/20 border-orange-500/40 text-orange-400 shadow-[0_0_15px_rgba(255,106,0,0.15)]";
+    return "bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
   };
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {plants.map((plant) => {
         const plantInvs = inverters.filter((i) => i.plant === plant);
         return (
-          <div key={plant}>
-            <p className="text-xs font-semibold text-[#A0A0A0] uppercase tracking-wider mb-2">{plant}</p>
-            <div className="grid grid-cols-2 gap-2">
+          <div key={plant} className="space-y-3 p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
+            <div className="flex items-center justify-between px-1">
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{plant}</p>
+              <span className="text-[10px] text-gray-600 font-mono italic">{plantInvs.length} UNITS</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2.5">
               {plantInvs.map((inv) => (
                 <div
                   key={inv.id}
-                  className="relative"
+                  className="relative group"
                   onMouseEnter={() => setHoveredId(inv.id)}
                   onMouseLeave={() => setHoveredId(null)}
                 >
                   <div
                     className={cn(
-                      "rounded-lg border px-3 py-2 text-center cursor-pointer transition-all duration-300",
-                      getColor(inv.status),
-                      "hover:scale-105 hover:shadow-lg"
+                      "rounded-xl border px-3 py-3 transition-all duration-300 cursor-crosshair transform active:scale-95",
+                      getStatusStyles(inv.status),
+                      "hover:bg-white/[0.1] hover:border-white/20"
                     )}
                   >
-                    <p className="text-xs font-bold text-white">{inv.id}</p>
-                    <p className="text-[10px] text-white/70">{inv.inverter_temp}°C</p>
+                    <p className="text-xs font-black tracking-tighter mb-1">{inv.id}</p>
+                    <div className="flex items-center justify-between">
+                       <p className="text-[10px] font-bold opacity-80">{inv.inverter_temp}°C</p>
+                       <Activity className="w-2.5 h-2.5 opacity-40 group-hover:opacity-100 transition-opacity" />
+                    </div>
                   </div>
+                  
                   {hoveredId === inv.id && (
-                    <div className="absolute z-30 bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 bg-[#111] border border-[#1f1f1f] rounded-lg p-3 shadow-2xl animate-fade-in">
-                      <p className="text-xs font-bold text-white">{inv.id} — {inv.plant}</p>
-                      <div className="mt-1.5 space-y-1 text-[11px]">
-                        <div className="flex justify-between"><span className="text-[#A0A0A0]">Inverter Temp</span><span className="text-white">{inv.inverter_temp}°C</span></div>
-                        <div className="flex justify-between"><span className="text-[#A0A0A0]">Power Output</span><span className="text-white">{(inv.inverter_power / 1000).toFixed(1)} kW</span></div>
-                        <div className="flex justify-between"><span className="text-[#A0A0A0]">Power Factor</span><span className="text-white">{inv.power_factor}</span></div>
-                        <div className="flex justify-between"><span className="text-[#A0A0A0]">Risk Score</span><span className={cn(inv.riskScore > 0.66 ? "text-red-400" : inv.riskScore > 0.33 ? "text-[#FF6A00]" : "text-emerald-400")}>{inv.riskScore.toFixed(2)}</span></div>
-                        <div className="flex justify-between"><span className="text-[#A0A0A0]">Alarm Codes</span><span className="text-white">{inv.inverters_alarm_code}</span></div>
+                    <div className="absolute z-[100] bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 bg-black/95 border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-xl animate-fade-in ring-1 ring-white/5">
+                      <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
+                        <span className="text-[10px] font-bold text-gray-500">{inv.id} CONTROL</span>
+                        <span className={cn("text-[9px] px-2 py-0.5 rounded-full font-bold uppercase", inv.status === 'High Risk' ? "bg-red-500/20 text-red-400" : inv.status === 'Medium Risk' ? "bg-orange-500/20 text-orange-400" : "bg-emerald-500/20 text-emerald-400")}>{inv.status}</span>
                       </div>
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-[#111] border-r border-b border-[#1f1f1f]" />
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="space-y-0.5">
+                          <p className="text-[9px] text-gray-500 font-bold uppercase">Temperature</p>
+                          <p className="text-xs font-bold text-white tracking-tight">{inv.inverter_temp}°C</p>
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-[9px] text-gray-500 font-bold uppercase">AC Output</p>
+                          <p className="text-xs font-bold text-white tracking-tight">{(inv.inverter_power / 1000).toFixed(1)} kW</p>
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-[9px] text-gray-500 font-bold uppercase">Risk Score</p>
+                          <p className={cn("text-xs font-bold tracking-tight", inv.riskScore > 0.66 ? "text-red-400" : inv.riskScore > 0.33 ? "text-orange-400" : "text-emerald-400")}>{(inv.riskScore * 100).toFixed(0)}%</p>
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-[9px] text-gray-500 font-bold uppercase">PF</p>
+                          <p className="text-xs font-bold text-white tracking-tight">{inv.power_factor}</p>
+                        </div>
+                      </div>
+                      <div className="pt-2 border-t border-white/5">
+                         <p className="text-[9px] text-orange-400 font-bold uppercase mb-1 flex items-center gap-1.5"><BrainCircuit className="w-3 h-3"/> AI Analysis</p>
+                         <p className="text-[10px] text-gray-400 leading-relaxed italic">&quot;{inv.status === 'Healthy' ? 'No anomalies detected. Performance is optimal.' : inv.status === 'High Risk' ? 'Immediate inspection required. Thermal limit nearing threshold.' : 'Monitoring increasing temp delta.'}&quot;</p>
+                      </div>
+                      <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black border-r border-b border-white/10 rotate-45" />
                     </div>
                   )}
                 </div>
@@ -184,6 +232,58 @@ function PlantHeatmap({ inverters }: { inverters: Inverter[] }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function AIInsightPanel({ inverters }: { inverters: Inverter[] }) {
+  const highRisk = inverters.filter(i => i.status === 'High Risk');
+  
+  return (
+    <div className="group relative overflow-hidden rounded-3xl border border-orange-500/20 bg-gradient-to-br from-orange-500/[0.05] to-transparent p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(255,106,0,0.05)] transition-all animate-slide-up">
+      <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+        <BrainCircuit className="w-32 h-32 text-orange-500" />
+      </div>
+      
+      <div className="flex flex-col md:flex-row md:items-start gap-8 relative z-10">
+        <div className="w-16 h-16 rounded-2xl bg-orange-500 shadow-[0_0_20px_rgba(255,106,0,0.4)] flex items-center justify-center flex-shrink-0 animate-float">
+          <BrainCircuit className="w-8 h-8 text-black" />
+        </div>
+        
+        <div className="space-y-6 flex-1">
+          <div>
+            <h3 className="text-2xl font-bold text-white tracking-tight">Sunlytix AI Insight</h3>
+            <p className="text-gray-400 text-sm mt-1">Generative predictive maintenance report</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 flex-shrink-0 shadow-[0_0_8px_rgba(255,106,0,0.8)]" />
+                <p className="text-sm text-gray-300 leading-relaxed">
+                  <span className="text-orange-400 font-bold font-mono">CRITICAL:</span> {highRisk.length > 0 ? `Block 2 shows abnormal temperature rise in ${highRisk[0].id}.` : "Inverter fleet maintaining optimal operating temperatures."}
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 flex-shrink-0 shadow-[0_0_8px_rgba(255,106,0,0.8)]" />
+                <p className="text-sm text-gray-300 leading-relaxed">
+                  <span className="text-orange-400 font-bold font-mono">PREDICTION:</span> {highRisk.length} inverters predicted to degrade significantly within <span className="text-white font-bold tracking-tighter">7 DAYS</span>.
+                </p>
+              </div>
+            </div>
+            
+            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Recommended Action</p>
+              <p className="text-sm text-white font-medium italic leading-relaxed">
+                "Initiate cooling fan inspection and clean ventilation intake on Plant {highRisk[0]?.plant?.slice(-1) || '2'} cluster to prevent thermal shutdown."
+              </p>
+              <button className="w-full py-2 bg-white text-black text-xs font-bold rounded-xl mt-2 hover:bg-orange-500 hover:text-white transition-all shadow-lg active:scale-95">
+                GENERATE MAINTENANCE TICKET
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -194,14 +294,14 @@ function PredictionTimeline({ inverters }: { inverters: Inverter[] }) {
   const stages = ["Today", "+3 Days", "+7 Days"];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {atRisk.map((inv) => {
         const isHigh = inv.status === "High Risk";
         return (
-          <div key={inv.id} className="flex items-center gap-4">
-            <div className="w-16 flex-shrink-0">
-              <p className="text-sm font-bold text-white">{inv.id}</p>
-              <p className="text-[10px] text-[#A0A0A0]">{inv.plant}</p>
+          <div key={inv.id} className="group flex items-center gap-6 p-4 rounded-2xl bg-white/[0.02] border border-white/5 transition-all hover:bg-white/5">
+            <div className="w-20 flex-shrink-0">
+              <p className="text-sm font-black text-white tracking-tighter">{inv.id}</p>
+              <p className="text-[10px] text-gray-500 font-bold uppercase">{inv.plant}</p>
             </div>
             <div className="flex-1 flex items-center gap-0">
               {stages.map((stage, i) => (
@@ -209,94 +309,98 @@ function PredictionTimeline({ inverters }: { inverters: Inverter[] }) {
                   <div className="flex flex-col items-center">
                     <div
                       className={cn(
-                        "w-6 h-6 rounded-full flex items-center justify-center text-xs border",
+                        "w-8 h-8 rounded-full flex items-center justify-center text-xs border-2 transition-all duration-500",
                         i === 0
-                          ? "bg-[#FF6A00]/20 border-[#FF6A00] text-[#FF6A00]"
+                          ? "bg-orange-500/20 border-orange-500 text-orange-500 shadow-[0_0_10px_rgba(255,106,0,0.3)]"
                           : i === 1
-                          ? isHigh ? "bg-red-500/20 border-red-500 text-red-400" : "bg-[#FF6A00]/20 border-[#FF6A00] text-[#FF6A00]"
-                          : isHigh ? "bg-red-500/30 border-red-500 text-red-400" : "bg-[#FF6A00]/10 border-[#FF6A00]/40 text-[#FF6A00]/60"
+                          ? isHigh ? "bg-red-500/20 border-red-500 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.2)]" : "bg-orange-500/10 border-orange-500/40 text-orange-400"
+                          : isHigh ? "bg-red-500/40 border-red-500/60 text-white animate-pulse" : "bg-white/5 border-white/10 text-gray-600"
                       )}
                     >
-                      {i === 0 ? "\u26A0" : i === 2 && isHigh ? "\u2715" : "\u26A0"}
+                      {i === 0 ? "\u26A0" : i === 2 && isHigh ? "\u2715" : i === 2 ? "\u2713" : "\u26A0"}
                     </div>
-                    <p className="text-[9px] text-[#666] mt-1">{stage}</p>
+                    <p className="text-[9px] font-bold text-gray-600 mt-2 uppercase tracking-tighter">{stage}</p>
                   </div>
                   {i < stages.length - 1 && (
-                    <div className="flex-1 h-0.5 mx-1 bg-gradient-to-r from-[#FF6A00]/40 to-red-500/40 rounded-full opacity-50" />
+                    <div className="flex-1 h-[2px] mx-2 bg-gradient-to-r from-orange-500/20 to-current opacity-20" />
                   )}
                 </div>
               ))}
             </div>
-            <div className="w-32 flex-shrink-0 text-right">
-              <p className={cn("text-xs font-medium", isHigh ? "text-red-400" : "text-[#FF6A00]")}>
-                {isHigh ? "shutdown risk" : "degradation risk"}
+            <div className="w-40 flex-shrink-0 text-right">
+              <p className={cn("text-xs font-black uppercase tracking-tight", isHigh ? "text-red-500" : "text-orange-500")}>
+                {isHigh ? "CRITICAL SHUTDOWN" : "DEGRADATION ALERT"}
               </p>
+              <p className="text-[10px] text-gray-500 mt-0.5">Prob: {(inv.riskScore * 100).toFixed(0)}%</p>
             </div>
           </div>
         );
       })}
       {atRisk.length === 0 && (
-        <p className="text-sm text-[#666] text-center py-4">No predicted failures — all inverters healthy</p>
+        <div className="py-12 flex flex-col items-center gap-3 text-gray-600 border-2 border-dashed border-white/5 rounded-3xl">
+          <CheckCircle className="w-8 h-8 opacity-20" />
+          <p className="text-sm font-medium tracking-tight">System nominal — 0 predicted failures detected</p>
+        </div>
       )}
     </div>
   );
 }
 
 /* ─── AI Monitoring Terminal ─── */
-function MonitoringTerminal() {
-  const allLogs = [
-    { text: "[AI] scanning inverter fleet — 6 inverters across 3 plants", type: "info" as const },
-    { text: "[AI] INV-05 thermal anomaly detected — inverter_temp 62\u00B0C", type: "alert" as const },
-    { text: "[AI] INV-03 power degradation — output dropped to 3200W", type: "alert" as const },
-    { text: "[AI] INV-05 risk score increased to 0.85", type: "warning" as const },
-    { text: "[AI] INV-04 power_factor declining — now 0.95", type: "warning" as const },
-    { text: "[AI] maintenance recommended: INV-05, INV-03", type: "action" as const },
-    { text: "[AI] Plant 1 status: all systems nominal", type: "info" as const },
-    { text: "[AI] Plant 2 risk elevated — 1 high risk, 1 medium risk", type: "warning" as const },
-    { text: "[AI] Plant 3 alert — INV-05 alarm_code count: 3", type: "alert" as const },
-    { text: "[AI] rolling_mean_power_24h analysis complete", type: "info" as const },
-    { text: "[AI] grid_frequency stable across all plants ~50Hz", type: "info" as const },
-    { text: "[AI] temp_difference anomaly: INV-05 at 23\u00B0C delta", type: "alert" as const },
-  ];
+const ALL_MONITOR_LOGS = [
+  { text: ">> AI_SYSTEM: Initializing multi-plant telemetry scan...", type: "info" as const },
+  { text: ">> ALERT: INV-05 thermal gradient detected [high_severity]", type: "alert" as const },
+  { text: ">> SIGNAL: INV-03 AC_output deviation from nominal baseline", type: "alert" as const },
+  { text: ">> PREDICT: Yield degradation expected at Plant 2 (+48h)", type: "warning" as const },
+  { text: ">> DATA: Cross-referencing historical maintenance logs...", type: "info" as const },
+  { text: ">> ACTION: Dispatching cooling efficiency recommendation", type: "action" as const },
+  { text: ">> STATUS: Grid synchronization confirmed @ 50.02Hz", type: "action" as const },
+  { text: ">> AI_CORE: Neural inference complete - 98.4% accuracy", type: "info" as const },
+];
 
-  const [visibleLogs, setVisibleLogs] = useState<typeof allLogs>([]);
+function MonitoringTerminal() {
+  const [logIndex, setLogIndex] = useState(0);
 
   useEffect(() => {
-    let idx = 0;
     const timer = setInterval(() => {
-      if (idx < allLogs.length) {
-        const currentLog = allLogs[idx];
-        idx++;
-        setVisibleLogs((prev) => [...prev, currentLog]);
-      } else {
-        clearInterval(timer);
-      }
-    }, 600);
+      setLogIndex((prev) => (prev < ALL_MONITOR_LOGS.length ? prev + 1 : prev));
+    }, 800);
     return () => clearInterval(timer);
   }, []);
 
+  const visibleLogs = ALL_MONITOR_LOGS.slice(0, logIndex);
+
   const typeColor = {
-    info: "text-[#555]",
-    warning: "text-[#FF6A00]",
-    alert: "text-red-400",
-    action: "text-emerald-400",
+    info: "text-gray-500",
+    warning: "text-orange-400",
+    alert: "text-red-500",
+    action: "text-white font-bold",
   };
 
   return (
-    <div className="bg-[#0a0a0a] rounded-lg border border-[#1a1a1a] p-4 h-64 overflow-y-auto font-mono text-xs">
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[#1a1a1a]">
-        <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-        <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-        <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-        <span className="text-[10px] text-[#444] ml-2">AI Monitor — live feed</span>
+    <div className="bg-black/80 rounded-2xl border border-white/5 p-5 h-72 overflow-y-auto font-mono ring-1 ring-white/5 shadow-inner">
+      <div className="flex items-center gap-2 mb-4 pb-2 border-b border-white/5">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+          <div className="w-2.5 h-2.5 rounded-full bg-orange-500/50" />
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
+        </div>
+        <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest ml-4">Sunlytix AI Live Interface</span>
+        <div className="ml-auto flex items-center gap-2">
+           <div className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-ping" />
+           <span className="text-[8px] text-orange-500 font-bold uppercase">Streaming</span>
+        </div>
       </div>
-      <div className="space-y-1">
-        {visibleLogs.map((log, i) => (
-          <p key={i} className={cn("animate-fade-in-up", typeColor[log.type])} style={{ animationDelay: `${i * 50}ms` }}>
+      <div className="space-y-1.5">
+        {visibleLogs.map((log, i) => log && (
+          <p key={i} className={cn("text-[11px] leading-relaxed animate-fade-in", typeColor[log.type])}>
             {log.text}
           </p>
         ))}
-        <span className="inline-block w-2 h-3.5 bg-[#FF6A00] animate-pulse-orange ml-0.5" />
+        <div className="flex items-center gap-2 mt-2">
+           <span className="text-orange-500 font-bold">{" >> "}</span>
+           <span className="w-2 h-4 bg-orange-500/80 animate-pulse-orange" />
+        </div>
       </div>
     </div>
   );
@@ -315,20 +419,20 @@ function CSVUploadPanel({ setInverters, showToast, refreshData }: { setInverters
         if (data.status === "completed") {
           clearInterval(interval);
           setUploading(false);
-          setUploadMsg(`✓ Processed ${data.result?.totalInverters || 0} inverters`);
-          showToast("Data updated in dashboard");
+          setUploadMsg(`✓ Data Analysis Complete: ${data.result?.totalInverters || 0} units synced`);
+          showToast("Fleet data updated");
           await refreshData();
         } else if (data.status === "failed") {
           clearInterval(interval);
           setUploading(false);
-          setUploadMsg(`✗ Error formatting data`);
+          setUploadMsg(`✗ Analysis failure in processing engine`);
         } else {
           setUploadMsg(data.message || `Processing... ${data.progress || 0}%`);
         }
       } catch (err) {
         clearInterval(interval);
         setUploading(false);
-        setUploadMsg("✗ Error checking status");
+        setUploadMsg("✗ Connectivity error during sync");
       }
     }, 2000);
   }
@@ -339,7 +443,7 @@ function CSVUploadPanel({ setInverters, showToast, refreshData }: { setInverters
 
     setUploading(true);
     setProgress(0);
-    setUploadMsg(`Uploading "${file.name}"...`);
+    setUploadMsg(`Uploading payload: "${file.name}"...`);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -351,7 +455,7 @@ function CSVUploadPanel({ setInverters, showToast, refreshData }: { setInverters
       if (event.lengthComputable) {
         const percent = Math.round((event.loaded / event.total) * 100);
         setProgress(percent);
-        if (percent === 100) setUploadMsg("Analyzing data via AI backend...");
+        if (percent === 100) setUploadMsg("Initializing AI Neural Analysis...");
       }
     };
 
@@ -362,21 +466,16 @@ function CSVUploadPanel({ setInverters, showToast, refreshData }: { setInverters
           if (res.jobId) pollStatus(res.jobId);
           else {
             setUploading(false);
-            setUploadMsg("✗ Server error: No job ID returned");
+            setUploadMsg("✗ Job ID acquisition failed");
           }
         } catch (e) {
           setUploading(false);
-          setUploadMsg("✗ Unknown response from server");
+          setUploadMsg("✗ System parsing error");
         }
       } else {
         setUploading(false);
-        setUploadMsg("✗ Upload failed. Server returned status " + xhr.status);
+        setUploadMsg("✗ Uplink failed: " + xhr.status);
       }
-    };
-
-    xhr.onerror = () => {
-      setUploading(false);
-      setUploadMsg("✗ Network error during upload");
     };
 
     xhr.send(formData);
@@ -384,19 +483,20 @@ function CSVUploadPanel({ setInverters, showToast, refreshData }: { setInverters
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <label
-        className="block rounded-xl border-2 border-dashed border-[#2A3448] bg-[#0a0a0a] p-6 text-center hover:border-[#FF6A00]/50 hover:bg-[#FF6A00]/5 transition-all cursor-pointer group"
+        className="block rounded-3xl border-2 border-dashed border-white/5 bg-white/[0.01] p-10 text-center hover:border-orange-500/40 hover:bg-orange-500/[0.03] hover:shadow-[0_0_30px_rgba(255,106,0,0.05)] transition-all cursor-pointer group relative overflow-hidden"
       >
-        <Upload className="w-8 h-8 text-[#555] mx-auto mb-3 group-hover:text-[#FF6A00] transition-colors" />
-        <p className="text-sm font-medium text-white">Drop CSV file here or click to browse</p>
-        <p className="text-xs text-[#6B7280] mt-1">
-          inverter_id · timestamp · temperature · efficiency · power_output · voltage
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,106,0,0.02),_transparent)] opacity-0 group-hover:opacity-100 transition-opacity" />
+        <Upload className="w-12 h-12 text-gray-700 mx-auto mb-4 group-hover:text-orange-500 group-hover:scale-110 transition-all duration-500" />
+        <p className="text-base font-bold text-white tracking-tight">Sync Fleet Telemetry</p>
+        <p className="text-xs text-gray-500 mt-2 font-medium max-w-[240px] mx-auto leading-relaxed">
+          Standard CSV format required: inverter_id, timestamp, temp, power, pf
         </p>
-        <span className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#FF6A00] text-white rounded-lg text-xs font-semibold hover:bg-[#e85d00] transition-colors">
-          <Upload className="w-3.5 h-3.5" />
-          Upload Telemetry CSV
-        </span>
+        <div className="mt-8 inline-flex items-center gap-2.5 px-6 py-3 bg-white text-black rounded-xl text-xs font-black uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all shadow-xl active:scale-95">
+          <Upload className="w-4 h-4" />
+          Select Data Payload
+        </div>
         <input
           type="file"
           accept=".csv"
@@ -407,29 +507,28 @@ function CSVUploadPanel({ setInverters, showToast, refreshData }: { setInverters
 
       {uploadMsg && (
         <div className={cn(
-          "flex flex-col gap-2 text-xs px-3 py-2.5 rounded-lg border",
+          "flex flex-col gap-3 p-5 rounded-2xl border backdrop-blur-md animate-slide-up",
           uploading
-            ? "bg-[#FF6A00]/5 border-[#FF6A00]/20 text-[#FF6A00]"
-            : "bg-emerald-500/5 border-emerald-500/20 text-emerald-400"
+            ? "bg-orange-500/5 border-orange-500/20 text-orange-400 shadow-[0_0_20px_rgba(255,106,0,0.05)]"
+            : "bg-emerald-500/5 border-emerald-500/20 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.05)]"
         )}>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider">
             {uploading
               ? <Activity className="w-4 h-4 animate-spin flex-shrink-0" />
               : <CheckCircle className="w-4 h-4 flex-shrink-0" />
             }
             {uploadMsg}
           </div>
-          {uploading && progress < 100 && (
-            <div className="w-full h-1 bg-black rounded-full overflow-hidden mt-2">
-              <div className="h-full bg-[#FF6A00] transition-all duration-300" style={{ width: `${progress}%` }} />
+          {uploading && (
+            <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden ring-1 ring-white/5">
+              <div 
+                className="h-full bg-orange-500 shadow-[0_0_10px_rgba(255,106,0,0.8)] transition-all duration-700 ease-out" 
+                style={{ width: `${Math.max(5, progress)}%` }} 
+              />
             </div>
           )}
         </div>
       )}
-
-      <div className="bg-[#0a0a0a] border border-[#1A1A1A] rounded-lg p-3">
-        <p className="text-[11px] font-semibold text-[#A0A0A0] uppercase tracking-wider mb-1.5">Compatible with the Solar Dataset format</p>
-      </div>
     </div>
   );
 }
@@ -506,22 +605,49 @@ export default function DashboardPage() {
       <AIStatusBar total={total} alerts={alerts} />
 
       {/* ─── Header ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">AI Control Center</h1>
-          <p className="text-sm text-[#A0A0A0] mt-0.5">
-            Real-time solar fleet intelligence — {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+          <h1 className="text-4xl font-bold text-white tracking-tight flex items-center gap-3">
+            <span className="w-1.5 h-8 bg-orange-500 rounded-full" />
+            AI Control Center
+          </h1>
+          <p className="text-base text-gray-400 mt-2 font-medium">
+            Real-time solar fleet intelligence — <span className="text-white">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</span>
           </p>
         </div>
-        <div className="flex items-center gap-3 text-xs text-[#666]">
-          <span className="flex items-center gap-1.5"><Gauge className="w-3.5 h-3.5" /> {(totalPower / 1000).toFixed(1)} kW total</span>
-          <span className="flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> {totalEnergyToday.toFixed(1)} kWh today</span>
-          <span className="flex items-center gap-1.5"><Thermometer className="w-3.5 h-3.5" /> {avgTemp.toFixed(0)}°C avg</span>          <button
+        
+        <div className="flex items-center gap-4 p-1.5 bg-white/[0.03] border border-white/10 rounded-2xl backdrop-blur-md">
+          <div className="px-4 py-2 text-center border-r border-white/5 last:border-0">
+            <div className="flex items-center justify-center gap-2 mb-0.5">
+              <Gauge className="w-3.5 h-3.5 text-orange-500 shadow-[0_0_8px_rgba(255,106,0,0.4)]" />
+              <span className="text-lg font-bold text-white">{(totalPower / 1000).toFixed(1)}</span>
+              <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">kW</span>
+            </div>
+            <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Total Output</p>
+          </div>
+          <div className="px-4 py-2 text-center border-r border-white/5 last:border-0">
+            <div className="flex items-center justify-center gap-2 mb-0.5">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+              <span className="text-lg font-bold text-white">{totalEnergyToday.toFixed(1)}</span>
+              <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">kWh</span>
+            </div>
+            <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Today&apos;s Yield</p>
+          </div>
+          <div className="px-4 py-2 text-center border-r border-white/5 last:border-0">
+            <div className="flex items-center justify-center gap-2 mb-0.5">
+              <Thermometer className="w-3.5 h-3.5 text-orange-400 shadow-[0_0_8px_rgba(251,146,60,0.4)]" />
+              <span className="text-lg font-bold text-white">{avgTemp.toFixed(0)}</span>
+              <span className="text-[10px] text-gray-500 font-bold uppercase mt-1">°C</span>
+            </div>
+            <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Avg Temp</p>
+          </div>
+          <button
             onClick={clearData}
-            className="ml-4 px-3 py-1 bg-red-600 text-white rounded-md text-xs hover:bg-red-500 transition-colors"
+            className="px-4 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all text-xs font-bold uppercase tracking-tighter"
           >
-            Clear Data
-          </button>        </div>
+            Reset
+          </button>
+        </div>
       </div>
 
       {/* ─── KPI Summary Cards ─── */}
@@ -534,49 +660,70 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard icon={Zap} title="Total Inverters" value={total} subtitle="Across 3 plants" color="blue" delay={0} />
-        <KPICard icon={ShieldCheck} title="Healthy" value={healthy} subtitle="Operating normally" color="green" delay={100} />
-        <KPICard icon={AlertCircle} title="Medium Risk" value={medium} subtitle="Monitoring closely" color="orange" delay={200} />
-        <KPICard icon={AlertTriangle} title="High Risk" value={high} subtitle="Immediate action required" color="red" delay={300} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <KPICard icon={Zap} title="Total Inverters" value={total} subtitle="Across 3 plants" color="white" delay={0} />
+        <KPICard icon={ShieldCheck} title="Healthy Fleet" value={healthy} subtitle="Optimal performance" color="green" delay={100} />
+        <KPICard icon={AlertCircle} title="Medium Risk" value={medium} subtitle="Predictive warnings" color="orange" delay={200} />
+        <KPICard icon={AlertTriangle} title="High Risk" value={high} subtitle="Critical anomalies" color="red" delay={300} />
       </div>
 
       {/* ─── Plant Health Overview — Pie + Heatmap ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="glass-card rounded-xl border border-[#1f1f1f] p-5">
-          <div className="flex items-center gap-2 mb-1">
-            <BrainCircuit className="w-4 h-4 text-[#FF6A00]" />
-            <h2 className="text-sm font-semibold text-white">Risk Distribution</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-4 rounded-3xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-xl shadow-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-orange-500/10">
+              <BrainCircuit className="w-5 h-5 text-orange-500" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white tracking-tight">Health Variance</h2>
+              <p className="text-xs text-gray-500 font-medium">Fleet-wide risk distribution</p>
+            </div>
           </div>
-          <p className="text-xs text-[#666] mb-4">Fleet health breakdown</p>
           <RiskDistributionChart healthy={healthy} medium={medium} high={high} />
         </div>
-        <div className="glass-card rounded-xl border border-[#1f1f1f] p-5">
-          <div className="flex items-center gap-2 mb-1">
-            <Activity className="w-4 h-4 text-[#FF6A00]" />
-            <h2 className="text-sm font-semibold text-white">Plant Risk Heatmap</h2>
+        
+        <div className="lg:col-span-8 rounded-3xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-xl shadow-2xl">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-orange-500/10">
+                <Activity className="w-5 h-5 text-orange-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white tracking-tight">Plant Risk Heatmap</h2>
+                <p className="text-xs text-gray-500 font-medium">Real-time unit performance</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-[10px] font-bold text-gray-500">
+               <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /> HEALTHY</div>
+               <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-500" /> WARNING</div>
+               <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-red-500" /> CRITICAL</div>
+            </div>
           </div>
-          <p className="text-xs text-[#666] mb-4">Hover for inverter details</p>
           <PlantHeatmap inverters={inverters} />
         </div>
       </div>
 
+      {/* ─── AI Insight Panel (NEW) ─── */}
+      <AIInsightPanel inverters={inverters} />
+
       {/* ─── Charts — Power + Temp ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="glass-card rounded-xl border border-[#1f1f1f] p-5">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="w-4 h-4 text-[#FF6A00]" />
-            <h2 className="text-sm font-semibold text-white">Power Output Trend</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-xl shadow-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-orange-500/10">
+              <TrendingUp className="w-5 h-5 text-orange-500" />
+            </div>
+            <h2 className="text-lg font-bold text-white tracking-tight">Power Output Trend</h2>
           </div>
-          <p className="text-xs text-[#666] mb-4">Fleet output — last 14 days (kW)</p>
           <PowerTrendChart data={mockPowerTrend} />
         </div>
-        <div className="glass-card rounded-xl border border-[#1f1f1f] p-5">
-          <div className="flex items-center gap-2 mb-1">
-            <Thermometer className="w-4 h-4 text-[#FF6A00]" />
-            <h2 className="text-sm font-semibold text-white">Temperature Trend</h2>
+        <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-xl shadow-2xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-orange-500/10">
+              <Thermometer className="w-5 h-5 text-orange-500" />
+            </div>
+            <h2 className="text-lg font-bold text-white tracking-tight">Temperature Trend</h2>
           </div>
-          <p className="text-xs text-[#666] mb-4">Avg inverter temp — last 14 days (°C)</p>
           <TempTrendChart data={mockTempTrend} />
         </div>
       </div>
@@ -610,33 +757,58 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ─── High-Risk Summary ─── */}
+      {/* ─── High-Risk Summary Alert Section ─── */}
       {high > 0 && (
-        <div className="glass-card rounded-xl border border-red-500/30 overflow-hidden shadow-[0_0_20px_rgba(239,68,68,0.1)]">
-          <div className="px-5 py-4 border-b border-red-500/20 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-400" />
-            <h2 className="text-sm font-semibold text-white">High-Risk Inverters — Immediate Action Required</h2>
+        <div className="group relative overflow-hidden rounded-3xl border border-red-500/30 bg-red-500/[0.02] shadow-[0_0_50px_rgba(239,68,68,0.05)] transition-all animate-slide-up">
+          <div className="absolute top-0 left-0 w-2 h-full bg-red-500 animate-pulse" />
+          
+          <div className="px-8 py-5 border-b border-red-500/10 flex items-center justify-between bg-red-500/[0.03]">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-red-500/20">
+                <AlertTriangle className="w-5 h-5 text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]" />
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-white tracking-tighter uppercase">High-Risk Fleet Anomalies</h2>
+                <p className="text-[10px] text-red-400 font-bold uppercase tracking-widest mt-0.5">Immediate intervention protocol active</p>
+              </div>
+            </div>
+            <div className="px-4 py-1.5 rounded-full bg-red-500 text-white text-[10px] font-black tracking-widest animate-pulse">
+               {high} UNITS REQUIRE ACTION
+            </div>
           </div>
-          <div className="divide-y divide-[#1f1f1f]">
+
+          <div className="divide-y divide-red-500/5">
             {inverters
               .filter((i) => i.status === "High Risk")
               .map((inv) => (
                 <a
                   key={inv.id}
                   href={`/inverters/${inv.id}`}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-3.5 hover:bg-red-500/5 transition-all group"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between px-8 py-4 hover:bg-red-500/[0.05] transition-all group/item"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="font-semibold text-sm text-white">{inv.id}</span>
-                    <span className="text-xs text-[#A0A0A0]">{inv.plant} · {inv.mac}</span>
+                  <div className="flex items-center gap-6">
+                    <div className="relative">
+                      <div className="w-3 h-3 rounded-full bg-red-500" />
+                      <div className="absolute inset-0 w-3 h-3 rounded-full bg-red-500 animate-ping opacity-40" />
+                    </div>
+                    <div>
+                      <span className="font-black text-base text-white tracking-tighter">{inv.id}</span>
+                      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">{inv.plant} · {inv.mac}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-5 text-xs mt-2 sm:mt-0">
-                    <span className="text-[#A0A0A0]">Temp: <span className="text-red-400 font-medium">{inv.inverter_temp}°C</span></span>
-                    <span className="text-[#A0A0A0]">Power: <span className="text-white">{(inv.inverter_power / 1000).toFixed(1)} kW</span></span>
-                    <span className="text-[#A0A0A0]">Risk: <span className="text-red-400 font-bold">{inv.riskScore.toFixed(2)}</span></span>
-                    <span className="text-[#A0A0A0]">Alarms: <span className="text-red-400">{inv.inverters_alarm_code}</span></span>
-                    <span className="text-[#FF6A00] opacity-0 group-hover:opacity-100 transition-opacity">View →</span>
+                  
+                  <div className="flex items-center gap-8 mt-4 sm:mt-0">
+                    <div className="text-right">
+                       <p className="text-[9px] text-gray-500 font-bold uppercase">Temp</p>
+                       <p className="text-sm font-black text-red-500">{inv.inverter_temp}°C</p>
+                    </div>
+                    <div className="text-right">
+                       <p className="text-[9px] text-gray-500 font-bold uppercase">Risk Index</p>
+                       <p className="text-sm font-black text-red-500">{(inv.riskScore * 100).toFixed(0)}%</p>
+                    </div>
+                    <div className="flex items-center gap-2 pl-4 border-l border-white/5">
+                      <span className="text-[10px] font-black text-white bg-white/5 px-3 py-1.5 rounded-lg group-hover/item:bg-orange-500 transition-colors">DIAGNOSE</span>
+                    </div>
                   </div>
                 </a>
               ))}

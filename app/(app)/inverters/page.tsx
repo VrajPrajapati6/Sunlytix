@@ -38,13 +38,13 @@ export default function InvertersPage() {
           </p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#00E5A8]/20 text-[#00E5A8]">
+          <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-gray-400">
             {healthy} Healthy
           </span>
-          <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FFB020]/20 text-[#FFB020]">
+          <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-500/10 border border-orange-500/20 text-orange-400">
             {medium} Medium Risk
           </span>
-          <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FF4D4F]/20 text-[#FF4D4F]">
+          <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-500/20 border border-orange-500/30 text-orange-500">
             {high} High Risk
           </span>
         </div>

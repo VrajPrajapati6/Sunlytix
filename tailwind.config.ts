@@ -79,6 +79,19 @@ const config: Config = {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        "particle-move": {
+          "0%, 100%": { transform: "translate(0, 0)", opacity: "0.2" },
+          "50%": { transform: "translate(100px, -100px)", opacity: "0.5" },
+        },
+        "scanning": {
+          "0%": { transform: "translateY(-100%)", opacity: "0" },
+          "50%": { opacity: "0.5" },
+          "100%": { transform: "translateY(100%)", opacity: "0" },
+        },
+        "pulse-orange": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.5", transform: "scale(1.1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -86,6 +99,9 @@ const config: Config = {
         "float": "float 3s ease-in-out infinite",
         "slide-up": "slide-up 0.5s ease-out forwards",
         "fade-in": "fade-in 0.4s ease-out forwards",
+        "particle-slow": "particle-move 20s linear infinite",
+        "scanning": "scanning 3s linear infinite",
+        "pulse-orange": "pulse-orange 2s ease-in-out infinite",
       },
     },
   },

@@ -29,7 +29,7 @@ export function RiskDistributionChart({ healthy, medium, high }: RiskPieProps) {
     { name: "Medium Risk", value: medium },
     { name: "High Risk", value: high },
   ];
-  const COLORS = ["#10b981", "#FF6A00", "#ef4444"];
+  const COLORS = ["#22C55E", "#FF6A00", "#FF4D4D"];
 
   return (
     <ResponsiveContainer width="100%" height={220}>
@@ -170,11 +170,11 @@ interface TelemetryPoint {
 
 export function TelemetryLineChart({ data, metric }: { data: TelemetryPoint[]; metric: "MODULE_TEMPERATURE" | "AC_POWER" | "DC_POWER" | "IRRADIATION" | "AMBIENT_TEMPERATURE" }) {
   const config = {
-    MODULE_TEMPERATURE: { color: "#f97316", name: "Module Temp (°C)", domain: [20, 90] as [number, number] },
-    AMBIENT_TEMPERATURE: { color: "#fb923c", name: "Ambient Temp (°C)", domain: [20, 60] as [number, number] },
+    MODULE_TEMPERATURE: { color: "#FF6A00", name: "Module Temp (°C)", domain: [20, 90] as [number, number] },
+    AMBIENT_TEMPERATURE: { color: "#FFA94D", name: "Ambient Temp (°C)", domain: [20, 60] as [number, number] },
     AC_POWER: { color: "#FF6A00", name: "AC Power (W)", domain: [0, 600] as [number, number] },
-    DC_POWER: { color: "#8b5cf6", name: "DC Power (W)", domain: [0, 640] as [number, number] },
-    IRRADIATION: { color: "#eab308", name: "Irradiation (W/m²)", domain: [0, 1050] as [number, number] },
+    DC_POWER: { color: "#FFA94D", name: "DC Power (W)", domain: [0, 640] as [number, number] },
+    IRRADIATION: { color: "#F59E0B", name: "Irradiation (W/m²)", domain: [0, 1050] as [number, number] },
   };
   const { color, name, domain } = config[metric];
 

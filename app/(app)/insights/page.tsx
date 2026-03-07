@@ -36,10 +36,10 @@ export default function InsightsPage() {
   };
 
   const filterOptions: { key: Filter; label: string; style: string }[] = [
-    { key: "all", label: `All (${counts.all})`, style: "text-foreground border-border hover:bg-white/5" },
-    { key: "high", label: `High Risk (${counts.high})`, style: "text-[#FF4D4F] border-[#FF4D4F]/30 hover:bg-[#FF4D4F]/10" },
-    { key: "medium", label: `Medium (${counts.medium})`, style: "text-[#FFB020] border-[#FFB020]/30 hover:bg-[#FFB020]/10" },
-    { key: "low", label: `Low (${counts.low})`, style: "text-primary border-primary/30 hover:bg-primary/10" },
+    { key: "all", label: `All (${counts.all})`, style: "text-white border-white/10 hover:bg-white/5" },
+    { key: "high", label: `High Risk (${counts.high})`, style: "text-orange-500 border-orange-500/30 hover:bg-orange-500/10" },
+    { key: "medium", label: `Medium (${counts.medium})`, style: "text-orange-400 border-orange-400/20 hover:bg-orange-400/10" },
+    { key: "low", label: `Low (${counts.low})`, style: "text-gray-400 border-white/10 hover:bg-white/5" },
   ];
 
   return (
@@ -72,17 +72,17 @@ export default function InsightsPage() {
 
       {/* Summary strip */}
       <div className="grid grid-cols-3 gap-3 print:grid-cols-3 print:gap-4 print:mb-8">
-        <div className="bg-[#FF4D4F]/10 border border-[#FF4D4F]/30 rounded-xl p-4 text-center print:bg-transparent print:border-gray-300">
-          <p className="text-2xl font-bold text-[#FF4D4F] print:text-black">{counts.high}</p>
-          <p className="text-xs text-[#FF4D4F]/70 mt-1 print:text-gray-600">High Risk</p>
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center print:bg-transparent print:border-gray-300">
+          <p className="text-2xl font-bold text-orange-500 print:text-black">{counts.high}</p>
+          <p className="text-[11px] text-gray-400 mt-1 print:text-gray-600 uppercase tracking-wider font-medium">High Risk</p>
         </div>
-        <div className="bg-[#FFB020]/10 border border-[#FFB020]/30 rounded-xl p-4 text-center print:bg-transparent print:border-gray-300">
-          <p className="text-2xl font-bold text-[#FFB020] print:text-black">{counts.medium}</p>
-          <p className="text-xs text-[#FFB020]/70 mt-1 print:text-gray-600">Medium Risk</p>
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center print:bg-transparent print:border-gray-300">
+          <p className="text-2xl font-bold text-orange-400 print:text-black">{counts.medium}</p>
+          <p className="text-[11px] text-gray-400 mt-1 print:text-gray-600 uppercase tracking-wider font-medium">Medium Risk</p>
         </div>
-        <div className="bg-primary/10 border border-primary/30 rounded-xl p-4 text-center print:bg-transparent print:border-gray-300">
-          <p className="text-2xl font-bold text-primary print:text-black">{counts.low}</p>
-          <p className="text-xs text-primary/70 mt-1 print:text-gray-600">Low Priority</p>
+        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center print:bg-transparent print:border-gray-300">
+          <p className="text-2xl font-bold text-white print:text-black">{counts.low}</p>
+          <p className="text-[11px] text-gray-400 mt-1 print:text-gray-600 uppercase tracking-wider font-medium">Healthy</p>
         </div>
       </div>
 
@@ -95,7 +95,7 @@ export default function InsightsPage() {
             onClick={() => setFilter(key)}
             className={cn(
               "px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors",
-              filter === key ? "ring-2 ring-primary/40 bg-secondary" : "",
+              filter === key ? "ring-2 ring-orange-500/20 bg-white/10" : "",
               style
             )}
           >
