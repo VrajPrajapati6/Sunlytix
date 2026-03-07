@@ -98,7 +98,7 @@ export default function InverterDetailPage() {
   const StatusIcon = cfg.icon;
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto px-4 lg:px-8 py-6">
       {/* breadcrumb */}
       <button
         onClick={() => router.push("/inverters")}
@@ -162,7 +162,7 @@ export default function InverterDetailPage() {
           24-Hour Telemetry
         </h2>
         {/* Tabs */}
-        <div className="flex gap-2 mb-4 border-b border-border pb-3">
+        <div className="flex flex-wrap gap-2 mb-4 border-b border-border pb-3">
           {(
             [
               { key: "MODULE_TEMPERATURE", label: "Module Temp", icon: Thermometer },

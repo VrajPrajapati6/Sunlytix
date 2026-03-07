@@ -7,7 +7,6 @@ import {
   Bell,
   User,
   LogOut,
-  Settings as SettingsIcon,
   ChevronDown,
   LayoutDashboard,
   Zap,
@@ -191,13 +190,6 @@ export default function DashboardHeader() {
                   >
                     <User className="w-4 h-4" />
                     My Profile
-                  </button>
-                  <button
-                    onClick={() => { setProfileOpen(false); router.push("/settings"); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-[#A0A0A0] hover:text-white hover:bg-white/5 transition-all"
-                  >
-                    <SettingsIcon className="w-4 h-4" />
-                    Account Settings
                   </button>
                   <div className="h-px bg-[#1f1f1f] my-1" />
                   <button
