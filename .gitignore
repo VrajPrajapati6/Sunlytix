@@ -43,8 +43,6 @@ __pycache__/
 .venv/
 
 # Large dataset files (store outside the repo)
-model-rag/
-model.pkl
 *.xlsx
 *.csv
 solar_ml_master_dataset/

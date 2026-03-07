@@ -1,0 +1,514 @@
+Sunlytix Solar Monitoring System Overview
+
+The Sunlytix platform monitors 6 solar inverters across 3 plants. The dataset contains 1,047,903 telemetry records collected from March 2024 onward. Each record includes power output, voltage, current, temperature, grid metrics, alarm codes, and operational state.
+
+Overall failure rate across the fleet: 53.4% of time windows show an upcoming failure within the prediction horizon. The ML model (RandomForestClassifier with 24 features) achieves 95.88% accuracy predicting future failures.
+
+Plants monitored:
+- Plant 1: Inverters INV-6E (MAC 54-10-EC-8C-14-6E) and INV-69 (MAC 54-10-EC-8C-14-69)
+- Plant 2: Inverters INV-BB (MAC 80-1F-12-0F-AC-BB) and INV-12 (MAC 80-1F-12-0F-AC-12)
+- Plant 3: Inverters INV-LT1 (MAC ICR2-LT1-Celestical-10000.73) and INV-LT2 (MAC ICR2-LT2-Celestical-10000.73)
+---DOC---
+Inverter Profile: INV-BB (MAC: 80-1F-12-0F-AC-BB)
+
+Location: Plant 2
+Total telemetry records: 186,605
+Failure rate: 52.9%
+
+Normal operation averages: power=17.5W, temperature=42.6°C
+Pre-failure averages: power=135.2W, temperature=44.2°C
+Maximum recorded: power=7123.2W, temperature=60.0°C
+
+Most frequent alarm during pre-failure windows: code 0 – No alarm – inverter operating normally.
+
+Key insight: Temperature rises by 1.6 degrees C on average before failure events.
+---DOC---
+Inverter Profile: INV-12 (MAC: 80-1F-12-0F-AC-12)
+
+Location: Plant 2
+Total telemetry records: 190,656
+Failure rate: 53.1%
+
+Normal operation averages: power=18.7W, temperature=42.3°C
+Pre-failure averages: power=52.1W, temperature=41.8°C
+Maximum recorded: power=1106274.1W, temperature=56.5°C
+
+Most frequent alarm during pre-failure windows: code 0 – No alarm – inverter operating normally.
+
+Key insight: Temperature does not significantly increase before failures for this inverter.
+---DOC---
+Inverter Profile: INV-LT2 (MAC: ICR2-LT2-Celestical-10000.73)
+
+Location: Plant 3
+Total telemetry records: 109,453
+Failure rate: 52.3%
+
+Normal operation averages: power=252.6W, temperature=13.5°C
+Pre-failure averages: power=1597.9W, temperature=44.8°C
+Maximum recorded: power=3860.3W, temperature=80.1°C
+
+Most frequent alarm during pre-failure windows: code 0 – No alarm – inverter operating normally.
+
+Key insight: Temperature rises by 31.3 degrees C on average before failure events.
+---DOC---
+Inverter Profile: INV-LT1 (MAC: ICR2-LT1-Celestical-10000.73)
+
+Location: Plant 3
+Total telemetry records: 187,003
+Failure rate: 54.2%
+
+Normal operation averages: power=176.1W, temperature=9.2°C
+Pre-failure averages: power=1649.4W, temperature=43.3°C
+Maximum recorded: power=4173.1W, temperature=79.7°C
+
+Most frequent alarm during pre-failure windows: code 0 – No alarm – inverter operating normally.
+
+Key insight: Temperature rises by 34.1 degrees C on average before failure events.
+---DOC---
+Inverter Profile: INV-6E (MAC: 54-10-EC-8C-14-6E)
+
+Location: Plant 1
+Total telemetry records: 187,774
+Failure rate: 53.4%
+
+Normal operation averages: power=2.2W, temperature=42.7°C
+Pre-failure averages: power=20.2W, temperature=44.6°C
+Maximum recorded: power=67.1W, temperature=60.1°C
+
+Most frequent alarm during pre-failure windows: code 0 – No alarm – inverter operating normally.
+
+Key insight: Temperature rises by 1.9 degrees C on average before failure events.
+---DOC---
+Inverter Profile: INV-69 (MAC: 54-10-EC-8C-14-69)
+
+Location: Plant 1
+Total telemetry records: 186,412
+Failure rate: 53.9%
+
+Normal operation averages: power=2.3W, temperature=42.7°C
+Pre-failure averages: power=20.0W, temperature=44.5°C
+Maximum recorded: power=66.6W, temperature=60.6°C
+
+Most frequent alarm during pre-failure windows: code 0 – No alarm – inverter operating normally.
+
+Key insight: Temperature rises by 1.7 degrees C on average before failure events.
+---DOC---
+Plant 1 Summary
+
+Inverters: INV-6E, INV-69 (MACs: 54-10-EC-8C-14-6E, 54-10-EC-8C-14-69)
+Total records: 374,186
+Fleet failure rate: 53.6%
+Average power output: 11.8W
+Average inverter temperature: 43.7°C
+Most common non-zero alarm code: 100 – General inverter warning – non-critical alert; check logs for details.
+
+This plant operates within normal failure rate bounds.
+---DOC---
+Plant 2 Summary
+
+Inverters: INV-BB, INV-12 (MACs: 80-1F-12-0F-AC-BB, 80-1F-12-0F-AC-12)
+Total records: 377,261
+Fleet failure rate: 53.0%
+Average power output: 57.9W
+Average inverter temperature: 42.7°C
+Most common non-zero alarm code: 548 – Over-temperature shutdown – inverter temperature exceeded safe operating limit (typically >75°C).
+
+This plant operates within normal failure rate bounds.
+---DOC---
+Plant 3 Summary
+
+Inverters: INV-LT2, INV-LT1 (MACs: ICR2-LT2-Celestical-10000.73, ICR2-LT1-Celestical-10000.73)
+Total records: 296,456
+Fleet failure rate: 53.5%
+Average power output: 967.3W
+Average inverter temperature: 28.4°C
+Most common non-zero alarm code: 0 – No alarm – inverter operating normally.
+
+This plant operates within normal failure rate bounds.
+---DOC---
+Solar Inverter Alarm Code Reference Guide
+
+The following alarm codes are observed in the Sunlytix monitoring system:
+
+- Alarm 0: No alarm – inverter operating normally. (Occurrences: 872,283, 83.24% of records)
+- Alarm 8: Grid under-voltage – grid voltage dropped below the acceptable threshold. (Occurrences: 40, 0.00% of records)
+- Alarm 10: Grid over-voltage – grid voltage exceeded the safe upper limit. (Occurrences: 12, 0.00% of records)
+- Alarm 39: Insulation resistance fault – DC-side insulation degradation detected. (Occurrences: 164, 0.02% of records)
+- Alarm 100: General inverter warning – non-critical alert; check logs for details. (Occurrences: 170,637, 16.28% of records)
+- Alarm 534: Fan failure – cooling fan stopped or running below required RPM. (Occurrences: 40, 0.00% of records)
+- Alarm 548: Over-temperature shutdown – inverter temperature exceeded safe operating limit (typically >75°C). (Occurrences: 2,307, 0.22% of records)
+- Alarm 556: DC arc fault detected – potential arc on the DC string wiring. (Occurrences: 8, 0.00% of records)
+- Alarm 558: Communication timeout – inverter lost data link with the monitoring gateway. (Occurrences: 1,975, 0.19% of records)
+- Alarm 563: Ground fault – current leakage to ground detected on DC side. (Occurrences: 431, 0.04% of records)
+
+Alarm code 0 means normal operation. Alarm 100 is the most common alert and indicates a general warning. Alarms 548 and 558 are significant – 548 indicates dangerous over-temperature and 558 indicates communication loss with the monitoring system.
+---DOC---
+Solar Inverter Operational State Reference Guide
+
+Inverters report an operational state code indicating their current mode:
+
+- State -1: Unknown / Offline – inverter is not communicating or in an undefined state. (Occurrences: 158,066, 15.08% of records)
+- State 0: Standby – inverter is powered on but not generating (e.g., nighttime or waiting for sufficient irradiance). (Occurrences: 505,602, 48.25% of records)
+- State 3: Starting – inverter is initializing and preparing to connect to grid. (Occurrences: 6,897, 0.66% of records)
+- State 4: Running (Grid-tied) – inverter is actively converting DC to AC and feeding power to the grid. (Occurrences: 191,077, 18.23% of records)
+- State 8: Shutdown – inverter has performed a controlled shutdown (manual or automated). (Occurrences: 4,342, 0.41% of records)
+- State 4864: Fault recovery – inverter is attempting to automatically recover from a fault condition. (Occurrences: 955, 0.09% of records)
+- State 5120: Warning state – inverter is running but has an active warning flag. Performance may be degraded. (Occurrences: 171,782, 16.39% of records)
+- State 5632: Derating – inverter has reduced output power to protect itself (thermal or voltage derating). (Occurrences: 1,453, 0.14% of records)
+- State 33280: Emergency stop – inverter was stopped due to a critical safety event. (Occurrences: 1,771, 0.17% of records)
+- State 37120: Maintenance mode – inverter is in service/maintenance mode, not producing power. (Occurrences: 4,714, 0.45% of records)
+
+State 0 (Standby) is the most common state, accounting for nighttime and low-irradiance periods. State 4 (Running) represents active power generation. State 5120 (Warning) is critical to monitor as it often precedes failure events.
+---DOC---
+ML Model Feature Guide: What Each Telemetry Signal Means
+
+The RandomForestClassifier uses 24 features to predict future inverter failures. Understanding what each feature represents helps interpret predictions:
+
+Power metrics:
+- inverter_power: Total AC power output of the inverter in watts. A sudden drop or spike indicates anomalies.
+- pv1_power / pv2_power: Power from PV string 1 and string 2. Imbalance between strings suggests shading, soiling, or string-level faults.
+- grid_power: Power flowing to/from the grid. Negative values indicate power export.
+- energy_today: Cumulative energy produced today in kWh.
+- energy_total: Lifetime energy production in kWh.
+
+Voltage and current:
+- pv1_voltage / pv2_voltage: DC voltage from each PV string. Low voltage may indicate shading or cell degradation.
+- pv1_current / pv2_current: DC current from each string. High current with low voltage can indicate short circuits.
+- power_factor: Ratio of real to apparent power. Values far from 1.0 indicate reactive power issues.
+
+Temperature:
+- inverter_temp: Internal temperature of the inverter in degrees Celsius. Normal range is 25-55 degrees C. Above 65 degrees C is a warning, above 75 degrees C triggers shutdown.
+- ambient_temperature: External ambient temperature (note: currently reads 0 in this dataset due to sensor issue).
+- temp_difference: Difference between inverter and ambient temperature. Due to ambient being 0, this equals inverter_temp.
+
+Grid:
+- grid_frequency: AC grid frequency in Hz. Normal is 49.9-50.1 Hz. Deviations indicate grid instability.
+
+Derived features:
+- smu_std_current: Standard deviation of current measurements. High values indicate unstable current flow.
+- rolling_mean_power_24h: 24-hour rolling average of power output. Tracks generation trends.
+- rolling_std_power_24h: 24-hour rolling standard deviation of power. High values indicate erratic output.
+- day_of_week: Day of week (0=Monday to 6=Sunday). Captures weekly maintenance patterns.
+
+Categorical:
+- inverters_alarm_code: Current alarm code (see Alarm Code Reference).
+- inverters_op_state: Current operational state (see Operational State Reference).
+- plant_id_plant_1 / plant_id_plant_2 / plant_id_plant_3: One-hot encoded plant identifier.
+---DOC---
+Root Cause Analysis: Common Solar Inverter Failure Modes
+
+Based on analysis of the Sunlytix fleet data, the following root causes are identified:
+
+1. Thermal Degradation
+   - Symptoms: inverter_temp above 65 degrees C, alarm code 548, op_state 5632 (derating)
+   - Cause: Blocked ventilation, fan failure (alarm 534), high ambient temperature, or excessive load
+   - Action: Inspect cooling system, clean air filters, check fan operation, verify ventilation clearance
+   - Prevention: Schedule quarterly fan inspections, install temperature monitoring alerts at 60 degrees C
+
+2. Communication Failures
+   - Symptoms: alarm code 558, op_state -1 (offline)
+   - Cause: Network cable damage, gateway malfunction, firmware bug, or power supply interruption
+   - Action: Check network cables, restart gateway, verify firmware version, inspect power supply
+   - Prevention: Use redundant communication paths, set up heartbeat monitoring
+
+3. Grid Instability
+   - Symptoms: grid_frequency outside 49.5-50.5 Hz, alarm codes 8 or 10, power_factor deviation
+   - Cause: Local grid voltage fluctuations, transformer issues, or utility-side problems
+   - Action: Monitor grid parameters, install voltage stabilizers, contact utility if persistent
+   - Prevention: Install grid-side monitoring, configure appropriate voltage ride-through settings
+
+4. DC-Side Faults
+   - Symptoms: alarm codes 39 (insulation), 556 (arc fault), 563 (ground fault)
+   - Cause: Cable insulation breakdown, connector corrosion, moisture ingress, rodent damage
+   - Action: Perform insulation resistance testing, inspect all DC connectors and cables
+   - Prevention: Annual IR testing, use rodent-proof conduit, apply waterproof connectors
+
+5. Power Output Instability
+   - Symptoms: high rolling_std_power_24h, large power swings, smu_std_current spikes
+   - Cause: Intermittent shading, tracker malfunction, MPPT hunting, or inverter control board issues
+   - Action: Inspect for shading sources, check tracker operation, review MPPT settings
+   - Prevention: Vegetation management, tracker maintenance schedule, firmware updates
+
+6. String Imbalance
+   - Symptoms: large difference between pv1_power and pv2_power, or pv1_current and pv2_current
+   - Cause: Panel degradation, soiling, shading on one string, broken bypass diode
+   - Action: Compare string-level IV curves, clean panels, inspect bypass diodes
+   - Prevention: Regular panel cleaning schedule, annual IV curve testing
+---DOC---
+Preventive Maintenance Schedule for Solar Inverters
+
+Daily checks (automated via Sunlytix):
+- Monitor inverter_power vs expected output for each inverter
+- Check for new alarm codes (non-zero inverters_alarm_code)
+- Verify all inverters are in expected op_state during daylight hours
+- Flag any inverter_temp readings above 60 degrees C
+
+Weekly checks:
+- Review rolling_std_power_24h trends — increasing values indicate developing issues
+- Compare string-level power (pv1_power vs pv2_power) for imbalance detection
+- Check grid_frequency stability patterns
+- Review the AI model failure predictions for the upcoming week
+
+Monthly checks:
+- Inspect inverter cooling systems (fans, filters, ventilation)
+- Clean panels if soiling is detected through power degradation
+- Verify communication reliability (any recurring alarm 558)
+- Review energy_today trends against historical baselines
+
+Quarterly checks:
+- Perform thermal imaging of all inverters during peak load
+- Test DC insulation resistance on all strings
+- Inspect all electrical connections for corrosion or loosening
+- Update inverter firmware if new versions are available
+
+Annual checks:
+- Full IV curve testing on all PV strings
+- Comprehensive electrical safety testing
+- Inverter calibration verification
+- Review and update alarm thresholds based on fleet performance data
+---DOC---
+Telemetry Thresholds and Alert Levels for Sunlytix Monitoring
+
+Temperature thresholds:
+- Normal: inverter_temp below 55 degrees C — no action needed
+- Elevated: 55-65 degrees C — monitor closely, check ventilation
+- Warning: 65-75 degrees C — schedule maintenance, consider derating
+- Critical: above 75 degrees C — immediate shutdown expected (alarm 548)
+
+Power output thresholds:
+- Normal variation: rolling_std_power_24h below 500W — expected daily fluctuation
+- Elevated variation: 500-1000W — check for shading or tracker issues
+- High variation: above 1000W — investigate inverter stability, MPPT, control board
+
+Grid frequency thresholds:
+- Normal: 49.9-50.1 Hz — stable grid connection
+- Caution: 49.5-49.9 Hz or 50.1-50.5 Hz — grid stress detected
+- Critical: below 49.5 Hz or above 50.5 Hz — disconnection may occur (alarms 8/10)
+
+Current stability:
+- Normal: smu_std_current below 50 — stable current flow
+- Warning: 50-200 — current fluctuations, check DC connections
+- Critical: above 200 — severe electrical instability, inspect immediately
+
+Power factor:
+- Normal: above 0.95 — clean power delivery
+- Warning: 0.85-0.95 — reactive power compensation may be needed
+- Poor: below 0.85 — investigate capacitor banks, inverter settings
+---DOC---
+Data-Driven Failure Patterns: Pre-Failure vs Normal Operation
+
+Analysis of 559,174 pre-failure records vs 488,729 normal records reveals:
+
+Temperature patterns:
+- Normal operation average temperature: 33.6 degrees C
+- Pre-failure average temperature: 43.8 degrees C
+- Temperature difference: 10.2 degrees C higher before failures
+
+Power stability:
+- Normal rolling_std_power_24h: 390.4W
+- Pre-failure rolling_std_power_24h: 390.8W
+- Power instability increases before failure events
+
+Current stability:
+- Normal smu_std_current: 1037.0
+- Pre-failure smu_std_current: 4663.7
+
+Grid frequency:
+- Normal grid_frequency: 49.999 Hz
+- Pre-failure grid_frequency: 50.003 Hz
+
+Alarm code distribution during pre-failure windows:
+- No alarm (code 0): 521,970 records (93.3%)
+- General warning (code 100): 32,616 records (5.8%)
+- Other alarms: 4,588 records
+---DOC---
+Temporal Failure Patterns in Solar Inverter Operation
+
+Hourly analysis:
+- Peak failure probability hour: 11:00 (98.6%)
+- Lowest failure probability hour: 23:00 (1.0%)
+- Nighttime (20:00-05:00): Inverters are typically in standby (op_state 0). Failures during night usually indicate communication or control system issues, not power conversion problems.
+- Peak generation hours (10:00-15:00): Highest thermal stress. Monitor inverter temperatures closely.
+- Morning ramp-up (06:00-09:00): MPPT initialization can cause brief power fluctuations. Alarm code 100 is common during startup.
+
+Day-of-week analysis:
+- Weekend failure rates may differ due to reduced maintenance staff availability
+- Monday spikes can indicate issues that developed over the weekend without intervention
+
+Seasonal considerations:
+- Summer: Higher ambient temperatures increase thermal stress. Watch for alarm 548 (over-temperature).
+- Winter: Lower irradiance means lower power output but also lower thermal stress.
+- Monsoon or rainy season: Watch for ground faults (alarm 563) and insulation faults (alarm 39) due to moisture.
+---DOC---
+Case Study: High Temperature Failure Event – INV-BB (Plant 2)
+
+Inverter: INV-BB (MAC: 80-1F-12-0F-AC-BB)
+Timestamp: 2024-05-03 13:40:01
+Inverter temperature: 60.0 degrees C
+Inverter power: 345.6W
+PV1 power: 40.9W
+PV2 power: 45.0W
+Alarm code: 0 – No alarm – inverter operating normally.
+Op state: 0 – Standby – inverter is powered on but not generating (e.g., nighttime or waiting for sufficient irradiance).
+Rolling std power 24h: 143.8W
+SMU std current: 8.2
+
+Analysis: This event shows the inverter reaching 60.0 degrees C, within typical operating range. Temperature alone was not the primary driver; check other parameters.
+---DOC---
+Case Study: High Temperature Failure Event – INV-12 (Plant 2)
+
+Inverter: INV-12 (MAC: 80-1F-12-0F-AC-12)
+Timestamp: 2024-05-02 12:55:02
+Inverter temperature: 56.5 degrees C
+Inverter power: 136.3W
+PV1 power: 17.3W
+PV2 power: 17.5W
+Alarm code: 558 – Communication timeout – inverter lost data link with the monitoring gateway.
+Op state: 37120 – Maintenance mode – inverter is in service/maintenance mode, not producing power.
+Rolling std power 24h: 55.2W
+SMU std current: 3.0
+
+Analysis: This event shows the inverter reaching 56.5 degrees C, within typical operating range. Temperature alone was not the primary driver; check other parameters.
+---DOC---
+Case Study: Communication Failure – INV-12 (Plant 2)
+
+Inverter: INV-12 (MAC: 80-1F-12-0F-AC-12)
+Timestamp: 2024-03-02 12:30:02
+Alarm code: 558 – Communication timeout
+Op state: 37120 – Maintenance mode – inverter is in service/maintenance mode, not producing power.
+Inverter power: 133.1W
+Inverter temperature: 48.2 degrees C
+
+Analysis: Communication timeout (alarm 558) indicates the inverter lost its data connection to the monitoring gateway. During this event, the inverter was still producing power, suggesting only the monitoring link was lost. Communication failures can mask developing faults since telemetry data is unavailable during the outage.
+---DOC---
+Case Study: High Temperature Failure Event – INV-LT2 (Plant 3)
+
+Inverter: INV-LT2 (MAC: ICR2-LT2-Celestical-10000.73)
+Timestamp: 2024-04-01 13:15:00
+Inverter temperature: 80.1 degrees C
+Inverter power: 3300.6W
+PV1 power: 3347.8W
+PV2 power: 0.0W
+Alarm code: 0 – No alarm – inverter operating normally.
+Op state: -1 – Unknown / Offline – inverter is not communicating or in an undefined state.
+Rolling std power 24h: 1385.0W
+SMU std current: 85.2
+
+Analysis: This event shows the inverter reaching 80.1 degrees C, well above typical operating range. The combination of high temperature and alarm code 0 suggests thermal stress was the primary failure driver.
+---DOC---
+How to Interpret ML Model Predictions
+
+The Sunlytix failure prediction model outputs:
+1. Binary prediction: 0 (no failure expected) or 1 (failure likely)
+2. Failure probability: 0.0 to 1.0 (confidence level)
+
+Probability interpretation:
+- 0.0 to 0.3: Low risk — continue normal monitoring
+- 0.3 to 0.5: Moderate risk — increase monitoring frequency
+- 0.5 to 0.7: High risk — schedule preventive maintenance within 48 hours
+- 0.7 to 0.9: Very high risk — schedule maintenance within 24 hours
+- 0.9 to 1.0: Critical — immediate inspection recommended
+
+SHAP analysis shows the top factors driving predictions:
+- rolling_std_power_24h (most important): High power variability is the strongest failure predictor
+- inverter_temp: Elevated temperature strongly predicts failures
+- smu_std_current: Unstable current patterns indicate electrical issues
+- inverters_alarm_code: Active alarms significantly increase failure probability
+- pv1_power and pv2_power: String-level power anomalies predict failures
+
+When the model predicts a failure, check the SHAP values to understand which specific features drove the prediction. This enables targeted maintenance rather than general inspection.
+---DOC---
+Question: Why is my inverter temperature increasing?
+
+Rising inverter temperature can be caused by several factors:
+1. Blocked ventilation – Check if air intake and exhaust vents are obstructed by dust, debris, or vegetation
+2. Fan failure – Alarm code 534 indicates fan malfunction. Inspect fan rotation and power supply
+3. High ambient temperature – Summer heat increases baseline temperature. Normal operating range is 25-55 degrees C
+4. Excessive load – Overloaded inverter generates more heat. Check if output exceeds rated capacity
+5. Internal component degradation – Aging capacitors or IGBTs generate excess heat
+
+Immediate actions: Check ventilation clearance, inspect fan operation, review recent power output levels.
+If temperature exceeds 65 degrees C, schedule maintenance. Above 75 degrees C, expect automatic shutdown (alarm 548).
+---DOC---
+Question: Why did my inverter shut down?
+
+Common shutdown causes and their alarm codes:
+- Alarm 548: Over-temperature – inverter exceeded thermal limits. Check cooling system.
+- Alarm 8: Grid under-voltage – grid voltage too low. Check grid connection and utility supply.
+- Alarm 10: Grid over-voltage – grid voltage too high. May need grid operator intervention.
+- Alarm 563: Ground fault – DC leakage current detected. Inspect cables and connectors.
+- Alarm 556: DC arc fault – dangerous arcing on DC wiring. Immediate inspection required.
+- Op state -1: Communication lost – inverter may still be running but monitoring is down.
+- Op state 33280: Emergency stop – triggered by critical safety event.
+
+Check the inverters_alarm_code and inverters_op_state for the specific cause.
+---DOC---
+Question: What does alarm code 100 mean?
+
+Alarm code 100 is a general inverter warning. It is the most frequently occurring non-zero alarm in the Sunlytix fleet, appearing in approximately 16% of all records. This alarm indicates a non-critical condition that the inverter has flagged for attention.
+
+Common triggers for alarm 100:
+- Grid frequency approaching limits but not yet out of range
+- Minor power factor deviation
+- Transient sensor reading outside normal range
+- Firmware-level informational alert
+
+Action: Alarm 100 alone typically does not require immediate intervention. However, if alarm 100 persists for more than 24 hours or appears alongside elevated inverter_temp or high rolling_std_power_24h, it may indicate a developing issue that warrants investigation.
+---DOC---
+Question: How do I know if my inverter is operating normally?
+
+A healthy inverter exhibits these characteristics:
+- Op state 4 (Running) during daylight hours
+- Op state 0 (Standby) during nighttime
+- Alarm code 0 (No alarm)
+- Inverter temperature between 25-55 degrees C
+- Grid frequency between 49.9-50.1 Hz
+- Power factor close to 1.0
+- Balanced PV string power (pv1_power approximately equals pv2_power)
+- Low rolling_std_power_24h (below 500W)
+- Low smu_std_current (below 50)
+
+If any of these parameters are outside normal range, investigate the cause. Use the ML model failure probability score for an integrated health assessment.
+---DOC---
+Question: Why is there a difference between pv1_power and pv2_power?
+
+String imbalance (difference between PV string 1 and PV string 2 power) can indicate:
+1. Partial shading – one string is shaded while the other receives full irradiance
+2. Soiling – dirt, dust, or bird droppings on panels in one string
+3. Panel degradation – cells in one string have aged or developed micro-cracks
+4. Bypass diode failure – a failed bypass diode in one string reduces output
+5. Wiring issue – loose connection, corroded terminal, or damaged cable on one string
+
+Action: Compare pv1_voltage and pv2_voltage alongside power. If voltage is also imbalanced, the issue is at the panel or string level. If voltage is balanced but current differs, look for soiling or shading.
+---DOC---
+Question: My inverter shows op_state 5120 (Warning). What should I do?
+
+Op state 5120 indicates the inverter is running but has an active warning condition. The inverter continues to produce power, but performance may be degraded.
+
+Steps to investigate:
+1. Check the concurrent alarm code – this tells you what specific warning is active
+2. Monitor inverter_temp – warning state often accompanies thermal issues
+3. Review rolling_std_power_24h – high values during warning state suggest power instability
+4. Check if the warning is intermittent or persistent
+5. Compare output with similar inverters at the same plant
+
+If the warning state persists for more than 4 hours during generation hours, schedule maintenance. Recurring warning states indicate a developing fault that will likely escalate to failure.
+---DOC---
+Comparative Performance Analysis Across Plants
+
+Plant 1 (Inverters: INV-6E, INV-69):
+- Average power: 11.8W
+- Average temperature: 43.7 degrees C
+- Failure rate: 53.6%
+
+Plant 2 (Inverters: INV-BB, INV-12):
+- Average power: 57.9W
+- Average temperature: 42.7 degrees C
+- Failure rate: 53.0%
+
+Plant 3 (Inverters: INV-LT1, INV-LT2):
+- Average power: 967.3W
+- Average temperature: 28.4 degrees C
+- Failure rate: 53.5%
+
+All plants have comparable data coverage.

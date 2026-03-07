@@ -1,0 +1,523 @@
+================================================================================
+  SUNLYTIX — ML MODEL & RAG SYSTEM DOCUMENTATION
+================================================================================
+  Date: March 7, 2026
+  Project: Sunlytix Solar Monitoring Platform
+================================================================================
+
+
+================================================================================
+  PART 1: ML MODEL
+================================================================================
+[ML Model Pipeline Diagram]
+
+    flowchart TD
+        subgraph ML Model
+          A1[solar_processed_dataset.csv] --> A2[24 Feature Columns]
+          A2 --> A3[RandomForestClassifier]
+          A3 --> A4[model.pkl]
+          A4 --> A5[Prediction: 0/1 + Probability]
+          A3 --> A6[SHAP Explainer]
+          A6 --> A7[Top 5 Feature Importances]
+        end
+
+1.1 MODEL TYPE
+    - Algorithm: RandomForestClassifier (scikit-learn)
+    - Estimators: 100 trees
+    - Max depth: Unlimited
+    - Criterion: Gini impurity
+    - File: model-rag/model.pkl
+
+1.2 PURPOSE
+    Predicts whether a solar inverter will experience a failure in the near
+    future based on current telemetry readings. Binary classification:
+      0 = No failure expected
+      1 = Failure likely
+
+1.3 DATASET
+    - File: solar_processed_dataset.csv
+    - Rows: 1,047,903 telemetry records
+    - Columns: 29
+    - Date range: March 2024 onward
+    - Inverters: 6 (across 3 plants)
+    - MACs:
+        Plant 1: 54-10-EC-8C-14-6E (INV-6E), 54-10-EC-8C-14-69 (INV-69)
+        Plant 2: 80-1F-12-0F-AC-BB (INV-BB), 80-1F-12-0F-AC-12 (INV-12)
+        Plant 3: ICR2-LT1-Celestical-10000.73 (INV-LT1),
+                 ICR2-LT2-Celestical-10000.73 (INV-LT2)
+
+1.4 FEATURES (24 total)
+    Power metrics:
+      - inverter_power, pv1_power, pv2_power, grid_power
+      - energy_today, energy_total
+
+    Voltage & current:
+      - pv1_voltage, pv2_voltage, pv1_current, pv2_current
+      - power_factor
+
+    Temperature:
+      - inverter_temp, ambient_temperature, temp_difference
+
+    Grid:
+      - grid_frequency
+
+    Derived:
+      - smu_std_current, rolling_mean_power_24h, rolling_std_power_24h
+      - day_of_week
+
+    Categorical:
+      - inverters_alarm_code, inverters_op_state
+      - plant_id_plant_1, plant_id_plant_2, plant_id_plant_3
+
+    Target variable: future_failure (True/False)
+    Note: hour_of_day is in the dataset but NOT used by the model.
+
+1.5 PERFORMANCE
+    - Test accuracy: 95.88%
+    - Train accuracy: 95.93%
+    - No overfitting (0.05% gap only)
+    - Class balance: 53.3% failure vs 46.6% no-failure (nearly balanced)
+    - No data leakage: failure_label and future_failure correctly excluded
+
+    Per-plant accuracy:
+      Plant 1: 96.5%
+      Plant 2: 96.9%
+      Plant 3: 93.9%
+
+1.6 KNOWN MODEL ISSUES
+    - ambient_temperature is always 0 in the dataset (sensor issue). This
+      makes temp_difference identical to inverter_temp. Both features are
+      in the model, wasting 13.86% combined importance on the same signal.
+    - hour_of_day is excluded from features despite being present in data.
+    - These are minor issues. Overall model grade: A-
+
+1.7 SHAP EXPLAINABILITY
+    - File: model-rag/exp_model.py
+    - Uses TreeExplainer for feature importance per prediction
+    - Shows top 5 factors driving each prediction
+    - Enables targeted maintenance instead of generic inspection
+
+1.8 PREDICTION SCRIPT
+    - File: model-rag/predict.py
+    - Input: new_telemetry_data.csv (same 24 feature columns)
+    - Output: Binary prediction + failure probability (0.0 to 1.0)
+
+
+================================================================================
+  PART 2: RAG (RETRIEVAL-AUGMENTED GENERATION) SYSTEM
+================================================================================
+[RAG Architecture Diagram]
+
+  flowchart TD
+    A[User Question] --> B[Sentence-Transformers\nall-MiniLM-L6-v2\n(384-dim vector)]
+    B --> C[FAISS Index\n(cosine similarity)]
+    C --> D[Top 5 Chunks]
+    D --> E[Context Builder]
+    E --> F[Groq API\nllama-3.3-70b-versatile]
+    F --> G[LLM Answer + Sources]
+
+2.1 WHAT IS RAG?
+    RAG combines information retrieval with LLM text generation. When a user
+    asks a question, the system:
+      1. Searches a knowledge base for relevant documents (retrieval)
+      2. Passes those documents as context to an LLM (augmentation)
+      3. The LLM generates an answer grounded in the retrieved context
+
+    This prevents hallucination and ensures answers are based on actual
+    Sunlytix fleet data, alarm codes, and maintenance procedures.
+
+2.2 RAG ARCHITECTURE
+    (See diagram above for full flow)
+
+2.2a RAG Pipeline File/Data Flow
+
+    flowchart TD
+     K1[generate_knowledge_base.py] --> K2[knowledge_base.txt\n(30 docs, 15 sections)]
+     K2 --> K3[create_chunks.py]
+     K3 --> K4[chunks.pkl\n(35 unique chunks)]
+     K4 --> K5[build_faiss_index.py]
+     K5 --> K6[faiss_index.bin\n(35 vectors)]
+     K6 --> K7[rag_retriever.py]
+     K7 --> K8[ask_rag(question)]
+     K8 --> K9[retrieve + augment + generate]
+     K9 --> K10[LLM Answer + Sources]
+
+2.3 RAG FILES
+
+    model-rag/generate_knowledge_base.py
+      - Reads solar_processed_dataset.csv
+      - Generates 30 diverse documents covering:
+          Section 1:  System overview (fleet stats, plant/inverter mapping)
+          Section 2:  Per-inverter profiles (6 profiles with failure stats)
+          Section 3:  Per-plant summaries (3 plants)
+          Section 4:  Alarm code reference guide (10 alarm codes with counts)
+          Section 5:  Operational state reference (10 op states with counts)
+          Section 6:  Feature interpretation guide (all 24 features explained)
+          Section 7:  Root cause analysis (6 failure modes with symptoms/actions)
+          Section 8:  Maintenance schedule (daily/weekly/monthly/quarterly/annual)
+          Section 9:  Threshold guidelines (temp, power, grid, current, PF)
+          Section 10: Data-driven failure patterns (pre-failure vs normal stats)
+          Section 11: Temporal patterns (hourly, weekly, seasonal)
+          Section 12: Case studies (real high-temp and comm-failure events)
+          Section 13: ML model interpretation guide
+          Section 14: FAQ documents (6 common questions with detailed answers)
+          Section 15: Comparative analysis across plants
+      - Output: knowledge_base.txt (documents separated by ---DOC---)
+
+    model-rag/create_chunks.py
+      - Reads knowledge_base.txt
+      - Splits by ---DOC--- separator (document-level chunking)
+      - Long documents (>1500 chars) split into overlapping sub-chunks
+      - Deduplication with order preservation
+      - Output: chunks.pkl (35 unique chunks, avg 773 chars each)
+
+    model-rag/build_faiss_index.py
+      - Loads chunks.pkl
+      - Encodes with all-MiniLM-L6-v2 (384-dimensional vectors)
+      - Normalizes embeddings for cosine similarity
+      - Builds FAISS IndexFlatIP (inner product = cosine for normalized vectors)
+      - Output: faiss_index.bin (35 vectors, 384 dimensions)
+
+    model-rag/rag_retriever.py
+      - Loads FAISS index + chunks + embedding model (lazy singleton)
+      - retrieve(query, top_k=5): returns top chunks with similarity scores
+      - call_groq(prompt, context): calls Groq API with context-augmented prompt
+      - ask_rag(question): full pipeline — retrieve + augment + generate
+      - Reads GROQ_API_KEY from .env file automatically
+      - CLI test mode: python rag_retriever.py "your question"
+      - Interactive mode: python rag_retriever.py (then type questions)
+
+    model-rag/run_pipeline.py
+      - Orchestrator script that runs all steps in order:
+          1. generate_knowledge_base.py
+          2. create_chunks.py
+          3. build_faiss_index.py
+          4. (optional with --test) test retrieval with 5 sample queries
+      - Usage: python run_pipeline.py --test
+
+2.4 KNOWLEDGE BASE CONTENT (DETAILED)
+
+    The knowledge base contains 30 documents organized into 15 sections:
+
+    SYSTEM OVERVIEW:
+      - Fleet size: 6 inverters, 3 plants
+      - Total records: 1,047,903
+      - Overall failure rate: ~53%
+      - Model accuracy: 95.88%
+      - Full plant-to-inverter-to-MAC mapping
+
+    PER-INVERTER PROFILES (6 documents, one per inverter):
+      Each profile contains:
+      - MAC address and plant location
+      - Total telemetry records
+      - Failure rate percentage
+      - Normal vs pre-failure average power and temperature
+      - Maximum recorded power and temperature
+      - Most frequent alarm code during pre-failure windows
+      - Key insight about temperature behavior before failures
+
+    PER-PLANT SUMMARIES (3 documents):
+      - Which inverters belong to each plant
+      - Fleet failure rate
+      - Average power and temperature
+      - Most common non-zero alarm code
+
+    ALARM CODE REFERENCE:
+      Code 0:   No alarm (normal operation)
+      Code 8:   Grid under-voltage
+      Code 10:  Grid over-voltage
+      Code 39:  Insulation resistance fault
+      Code 100: General warning (most common, ~16% of records)
+      Code 534: Fan failure
+      Code 548: Over-temperature shutdown
+      Code 556: DC arc fault
+      Code 558: Communication timeout
+      Code 563: Ground fault
+      Each code includes occurrence count and percentage from actual data.
+
+    OPERATIONAL STATE REFERENCE:
+      State -1:    Unknown/Offline
+      State 0:     Standby (most common — nighttime)
+      State 3:     Starting
+      State 4:     Running (active generation)
+      State 8:     Shutdown
+      State 4864:  Fault recovery
+      State 5120:  Warning state
+      State 5632:  Derating
+      State 33280: Emergency stop
+      State 37120: Maintenance mode
+      Each state includes occurrence count from actual data.
+
+    FEATURE INTERPRETATION GUIDE:
+      Explains all 24 model features in plain language — what each represents,
+      normal values, and what anomalies mean.
+
+    ROOT CAUSE ANALYSIS (6 failure modes):
+      1. Thermal Degradation — symptoms, causes, actions, prevention
+      2. Communication Failures — symptoms, causes, actions, prevention
+      3. Grid Instability — symptoms, causes, actions, prevention
+      4. DC-Side Faults — symptoms, causes, actions, prevention
+      5. Power Output Instability — symptoms, causes, actions, prevention
+      6. String Imbalance — symptoms, causes, actions, prevention
+
+    MAINTENANCE SCHEDULE:
+      Daily, weekly, monthly, quarterly, annual check items specific to
+      solar inverter fleet monitoring.
+
+    THRESHOLD GUIDELINES:
+      Temperature: Normal (<55°C), Elevated (55-65°C), Warning (65-75°C),
+                   Critical (>75°C)
+      Power variability, grid frequency, current stability, power factor
+      thresholds with action levels.
+
+    DATA-DRIVEN FAILURE PATTERNS:
+      Actual statistical comparison of pre-failure vs normal operation:
+      temperature, power stability, current stability, grid frequency,
+      and alarm code distribution — all from real dataset analysis.
+
+    TEMPORAL PATTERNS:
+      Hourly failure probability analysis, peak/minimum hours,
+      day-of-week patterns, seasonal considerations.
+
+    CASE STUDIES:
+      Real events from the dataset — high temperature failures and
+      communication failures with actual telemetry values and analysis.
+
+    ML MODEL INTERPRETATION GUIDE:
+      How to read prediction outputs, probability thresholds (0-0.3 low,
+      0.3-0.5 moderate, 0.5-0.7 high, 0.7-0.9 very high, 0.9-1.0 critical),
+      SHAP value interpretation.
+
+    FAQ DOCUMENTS (6 questions):
+      - Why is my inverter temperature increasing?
+      - Why did my inverter shut down?
+      - What does alarm code 100 mean?
+      - How do I know if my inverter is operating normally?
+      - Why is there a difference between pv1_power and pv2_power?
+      - My inverter shows op_state 5120 — what should I do?
+
+    COMPARATIVE ANALYSIS:
+      Cross-plant performance comparison with averages and failure rates.
+
+
+================================================================================
+  PART 3: ISSUES FOUND IN ORIGINAL RAG & HOW THEY WERE FIXED
+================================================================================
+
+3.1 ISSUE #1: KNOWLEDGE BASE HAD ZERO DIVERSITY (CRITICAL)
+    -------------------------------------------------------
+    BEFORE:
+      - generate_knowledge_base.py sampled 200 random failure rows
+      - Every document used the EXACT same template:
+          "Solar inverter anomaly detected.
+           Observed telemetry signals:
+           - inverter_power: [number]
+           - pv1_power: [number]
+           ...
+           Interpretation:
+           These conditions previously occurred before inverter failure.
+           High temperature, unstable power output, and current variability
+           are common indicators of inverter degradation."
+      - Only 6 telemetry values changed between documents — everything else
+        was identical text
+      - No inverter IDs, no MACs, no plant identifiers
+      - No alarm code explanations
+      - No operational state meanings
+      - No maintenance procedures
+      - No root cause analysis
+      - No thresholds or guidelines
+      - Result: 200 documents that all said the same thing with different numbers
+
+    AFTER:
+      - 30 diverse documents covering 15 different content sections
+      - Real per-inverter profiles with actual fleet statistics
+      - Full alarm code reference with occurrence counts from the dataset
+      - Full operational state reference with real counts
+      - Root cause analysis for 6 common failure modes
+      - Maintenance schedules, threshold guidelines, FAQ answers
+      - Case studies from actual high-severity events in the data
+      - Every document is unique and self-contained
+
+
+3.2 ISSUE #2: CHUNKING WAS COMPLETELY BROKEN (CRITICAL)
+    ----------------------------------------------------
+    BEFORE:
+      - create_chunks.py split the entire knowledge base by "\n" (newline)
+      - This created 2,400 single-line fragments
+      - Average chunk length: 33.7 characters (a single short sentence)
+      - Example chunks:
+          "- inverter_power: 43.2"
+          "Solar inverter anomaly detected."
+          "are common indicators of inverter degradation."
+      - 1,353 of 2,400 chunks were DUPLICATES (56% duplication rate)
+      - No chunk contained a complete thought or useful context
+
+    AFTER:
+      - Splits by "---DOC---" separator (document-level chunking)
+      - Each chunk is a complete, self-contained paragraph
+      - 35 unique chunks (zero duplicates)
+      - Average chunk length: 773 characters (~15-20x longer)
+      - Long documents (>1500 chars) split into overlapping sub-chunks
+        with 200-char overlap for context continuity
+      - Every chunk contains enough context to be useful on its own
+
+
+3.3 ISSUE #3: RETRIEVAL RETURNED GARBAGE (CRITICAL)
+    ------------------------------------------------
+    BEFORE:
+      - Because chunks were single lines, similarity search returned
+        irrelevant fragments
+      - Test queries and results:
+          Q: "Why is inverter temperature increasing?"
+          A: "- inverter_power: 43.2" (irrelevant)
+
+          Q: "What alarm code 548 means?"
+          A: "Solar inverter anomaly detected." (generic, wrong)
+
+          Q: "Tell me about Plant 2"
+          A: "- pv1_power: 125.8" (just a number)
+
+          Q: "How to prevent failures?"
+          A: "are common indicators of inverter degradation." (fragment)
+      - Every query returned random line fragments instead of useful answers
+
+    AFTER:
+      - Retrieval returns complete, relevant documents
+      - Test results with scores (cosine similarity, higher = better):
+          Q: "Why is inverter temperature increasing?"
+          → score=0.695 | FAQ: Rising inverter temperature causes... (RELEVANT)
+
+          Q: "What does alarm code 548 mean?"
+          → score=0.612 | Alarm code reference with full descriptions (RELEVANT)
+
+          Q: "Tell me about Plant 2 performance"
+          → score=0.426 | Comparative plant analysis (RELEVANT)
+
+          Q: "How do I prevent inverter failures?"
+          → score=0.615 | Case studies + maintenance recommendations (RELEVANT)
+
+          Q: "What is op state 5120?"
+          → score=0.500 | Op state reference + FAQ answer (RELEVANT)
+
+
+3.4 ISSUE #4: NO LLM INTEGRATION (INCOMPLETE)
+    -------------------------------------------
+    BEFORE:
+      - rag_retriver.py (note: typo in filename) retrieved chunks and
+        built a prompt string, but NEVER called any LLM
+      - The create_prompt() function generated a prompt template but
+        just printed it to console
+      - No Groq, no OpenAI, no local model — nothing
+      - The RAG pipeline was literally just "retrieve and print"
+
+    AFTER:
+      - rag_retriever.py (filename fixed) has full Groq API integration
+      - Uses llama-3.3-70b-versatile model
+      - System prompt configured for Sunlytix solar monitoring context
+      - Reads GROQ_API_KEY from .env file automatically
+      - Proper error handling for API failures
+      - Returns structured response: { answer: str, sources: list }
+      - Interactive CLI test mode for easy debugging
+      - Can be imported as a module: from rag_retriever import ask_rag
+
+
+3.5 ISSUE #5: FAISS INDEX USED L2 DISTANCE (SUBOPTIMAL)
+    ----------------------------------------------------
+    BEFORE:
+      - Used IndexFlatL2 (Euclidean distance) without normalized embeddings
+      - L2 distance doesn't account for vector magnitude differences
+      - Results were less accurate for semantic similarity
+
+    AFTER:
+      - Embeddings are normalized (normalize_embeddings=True)
+      - Uses IndexFlatIP (Inner Product) which equals cosine similarity
+        for normalized vectors
+      - Produces more accurate semantic matching scores (0-1 range)
+
+
+3.6 ISSUE #6: NO PIPELINE ORCHESTRATION
+    ------------------------------------
+    BEFORE:
+      - Each script had to be run manually in the correct order
+      - No way to rebuild everything with one command
+      - No validation or testing step
+
+    AFTER:
+      - run_pipeline.py orchestrates all steps:
+          1. Generate knowledge base
+          2. Create chunks
+          3. Build FAISS index
+          4. (optional) Test retrieval
+      - Single command: python run_pipeline.py --test
+      - Reports timing for each step
+      - Exits immediately on failure
+
+
+================================================================================
+  PART 4: SUMMARY COMPARISON
+================================================================================
+
+  METRIC                  | BEFORE (BROKEN)         | AFTER (FIXED)
+  ------------------------+-------------------------+-------------------------
+  Documents               | 200 identical templates  | 30 diverse documents
+  Content sections        | 1 (same template)        | 15 unique sections
+  Chunks                  | 2,400 single lines       | 35 paragraph chunks
+  Avg chunk length        | 34 chars                 | 773 chars
+  Duplicates              | 1,353 (56%)              | 0 (0%)
+  Retrieval quality       | Garbage fragments        | Relevant documents
+  Retrieval scores        | Random/low               | 0.3 - 0.7 (strong)
+  LLM integration         | None                     | Groq (llama-3.3-70b)
+  FAISS similarity        | L2 (Euclidean)           | Cosine (normalized IP)
+  Pipeline automation     | Manual                   | One-command runner
+  Alarm codes documented  | None                     | 10 codes with stats
+  Op states documented    | None                     | 10 states with stats
+  Inverter profiles       | None                     | 6 profiles with stats
+  Root cause analysis     | None                     | 6 failure modes
+  Maintenance guide       | None                     | Full schedule
+  FAQ answers             | None                     | 6 detailed Q&As
+
+  MODEL GRADE: A- (unchanged, model.pkl was already solid)
+  RAG GRADE:   F → A (complete rebuild)
+
+
+================================================================================
+  PART 5: HOW TO USE
+================================================================================
+
+  REBUILD RAG (after data changes):
+    cd model-rag
+    python run_pipeline.py --test
+
+  TEST A SINGLE QUESTION:
+    python rag_retriever.py "Why is inverter temperature high?"
+
+  INTERACTIVE MODE:
+    python rag_retriever.py
+    > Type questions, get answers
+    > Type 'quit' to exit
+
+  USE IN CODE:
+    from rag_retriever import ask_rag
+    result = ask_rag("What does alarm 548 mean?")
+    print(result["answer"])    # LLM-generated answer
+    print(result["sources"])   # retrieved chunks with scores
+
+  RUN PREDICTION:
+    python predict.py
+    # Reads new_telemetry_data.csv, outputs prediction + probability
+
+  RUN SHAP EXPLANATION:
+    python exp_model.py
+    # Shows top 5 features driving the prediction
+
+  REQUIREMENTS:
+    pip install pandas numpy scikit-learn faiss-cpu sentence-transformers shap
+
+  GROQ API KEY:
+    Set GROQ_API_KEY in your .env file for LLM-powered answers.
+    Get a key at: https://console.groq.com/keys
+
+
+================================================================================
+  END OF DOCUMENT
+================================================================================
