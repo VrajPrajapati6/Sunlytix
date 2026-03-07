@@ -15,7 +15,6 @@ const DashboardPreview = dynamic(() => import("@/components/landing/DashboardPre
 const TechnologySection = dynamic(() => import("@/components/landing/TechnologySection"));
 const AssistantSection = dynamic(() => import("@/components/landing/AssistantSection"));
 const CTASection = dynamic(() => import("@/components/landing/CTASection"));
-const LandingFooter = dynamic(() => import("@/components/landing/LandingFooter"));
 
 export default function LandingPage() {
   const [showSplash, setShowSplash] = useState(true);
@@ -69,7 +68,6 @@ export default function LandingPage() {
       </div>
 
       <CTASection />
-      <LandingFooter />
     </motion.div>
     </>
   );
