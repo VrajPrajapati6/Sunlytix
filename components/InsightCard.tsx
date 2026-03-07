@@ -44,7 +44,8 @@ function formatTimestamp(ts: string): string {
 }
 
 export default function InsightCard({ insight }: InsightCardProps) {
-  const cfg = severityConfig[insight.severity];
+  const normalizedSeverity = (insight.severity || "low").toLowerCase() as keyof typeof severityConfig;
+  const cfg = severityConfig[normalizedSeverity] || severityConfig.low;
   const Icon = cfg.icon;
 
   const [isExpanded, setIsExpanded] = useState(false);

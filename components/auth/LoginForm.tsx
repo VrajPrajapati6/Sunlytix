@@ -201,15 +201,6 @@ export default function LoginForm({ onSwitchToSignup }: LoginFormProps) {
         </button>
       </p>
 
-      {/* DEV ONLY — Skip Auth */}
-      <motion.button
-        onClick={() => router.push("/dashboard")}
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
-        className="w-full mt-4 py-4 border border-dashed border-white/20 rounded-xl text-gray-500 hover:text-white hover:border-white/40 transition-all text-sm tracking-wider uppercase"
-      >
-        ⚡ Enter (Dev Mode)
-      </motion.button>
     </motion.div>
   );
 }

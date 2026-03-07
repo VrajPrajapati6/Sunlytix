@@ -302,97 +302,84 @@ function MonitoringTerminal() {
   );
 }
 
-/* ─── CSV Upload Panel ─── */
-function parseCSV(csvText: string): Inverter[] {
-  const lines = csvText.trim().split('\n');
-  if (lines.length < 2) throw new Error('Invalid CSV: no data rows');
-
-  const headers = lines[0].split(',').map(h => h.trim());
-  const expected = ['inverter_id', 'timestamp', 'temperature', 'efficiency', 'power_output', 'voltage', 'current', 'alarm_count'];
-
-  if (!expected.every(e => headers.includes(e))) throw new Error('Invalid CSV: missing required columns');
-
-  const inverters: Inverter[] = [];
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim());
-    if (values.length !== headers.length) continue;
-
-    const row: any = {};
-    headers.forEach((h, idx) => row[h] = values[idx]);
-
-    const status: InverterStatus = parseInt(row.alarm_count) > 0 ? 'High Risk' : 'Healthy';
-
-    const inverter: Inverter = {
-      id: row.inverter_id,
-      mac: row.inverter_id,
-      plant: 'Uploaded',
-      inverter_power: parseFloat(row.power_output) || 0,
-      pv1_power: 0,
-      pv2_power: 0,
-      energy_today: 0,
-      energy_total: 0,
-      power_factor: 0,
-      grid_frequency: 0,
-      grid_power: parseFloat(row.power_output) || 0,
-      pv1_voltage: parseFloat(row.voltage) || 0,
-      pv2_voltage: 0,
-      pv1_current: parseFloat(row.current) || 0,
-      pv2_current: 0,
-      ambient_temperature: 0,
-      inverter_temp: parseFloat(row.temperature) || 0,
-      temp_difference: 0,
-      inverters_alarm_code: parseInt(row.alarm_count) || 0,
-      inverters_op_state: 0,
-      rolling_mean_power_24h: 0,
-      rolling_std_power_24h: 0,
-      failure_label: 0,
-      riskScore: parseInt(row.alarm_count) || 0,
-      status,
-      DC_POWER: 0,
-      AC_POWER: parseFloat(row.power_output) || 0,
-      MODULE_TEMPERATURE: parseFloat(row.temperature) || 0,
-      AMBIENT_TEMPERATURE: 0,
-      IRRADIATION: 0,
-      location: 'Uploaded',
-      runtimeHours: 0,
-      lastMaintenance: '',
-    };
-    inverters.push(inverter);
-  }
-  return inverters;
-}
-
-function CSVUploadPanel({ setInverters, showToast }: { setInverters: (inv: Inverter[]) => void; showToast: (msg: string) => void }) {
+function CSVUploadPanel({ setInverters, showToast, refreshData }: { setInverters: (inv: Inverter[]) => void; showToast: (msg: string) => void; refreshData: () => Promise<void> }) {
   const [uploadMsg, setUploadMsg] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  function pollStatus(jobId: string) {
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/upload-status/${jobId}`);
+        const data = await res.json();
+        if (data.status === "completed") {
+          clearInterval(interval);
+          setUploading(false);
+          setUploadMsg(`✓ Processed ${data.result?.totalInverters || 0} inverters`);
+          showToast("Data updated in dashboard");
+          await refreshData();
+        } else if (data.status === "failed") {
+          clearInterval(interval);
+          setUploading(false);
+          setUploadMsg(`✗ Error formatting data`);
+        } else {
+          setUploadMsg(data.message || `Processing... ${data.progress || 0}%`);
+        }
+      } catch (err) {
+        clearInterval(interval);
+        setUploading(false);
+        setUploadMsg("✗ Error checking status");
+      }
+    }, 2000);
+  }
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    setUploadMsg(`Processing "${file.name}"…`);
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const csvText = event.target?.result as string;
-        const parsed = parseCSV(csvText);
-        setInverters(parsed);
-        setUploading(false);
-        setUploadMsg(`✓ "${file.name}" processed — ${parsed.length} inverters loaded`);
-        showToast('CSV data loaded successfully');
-      } catch (err) {
-        setUploading(false);
-        setUploadMsg(`✗ Error: ${(err as Error).message}`);
+    setUploading(true);
+    setProgress(0);
+    setUploadMsg(`Uploading "${file.name}"...`);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload-csv", true);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        setProgress(percent);
+        if (percent === 100) setUploadMsg("Analyzing data via AI backend...");
       }
     };
-    reader.onerror = () => {
-      setUploading(false);
-      setUploadMsg('✗ Error reading file');
-    };
-    reader.readAsText(file);
 
-    // Reset input so same file can be re-selected
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (res.jobId) pollStatus(res.jobId);
+          else {
+            setUploading(false);
+            setUploadMsg("✗ Server error: No job ID returned");
+          }
+        } catch (e) {
+          setUploading(false);
+          setUploadMsg("✗ Unknown response from server");
+        }
+      } else {
+        setUploading(false);
+        setUploadMsg("✗ Upload failed. Server returned status " + xhr.status);
+      }
+    };
+
+    xhr.onerror = () => {
+      setUploading(false);
+      setUploadMsg("✗ Network error during upload");
+    };
+
+    xhr.send(formData);
     e.target.value = "";
   }
 
@@ -420,25 +407,28 @@ function CSVUploadPanel({ setInverters, showToast }: { setInverters: (inv: Inver
 
       {uploadMsg && (
         <div className={cn(
-          "flex items-center gap-2 text-xs px-3 py-2.5 rounded-lg border",
+          "flex flex-col gap-2 text-xs px-3 py-2.5 rounded-lg border",
           uploading
             ? "bg-[#FF6A00]/5 border-[#FF6A00]/20 text-[#FF6A00]"
             : "bg-emerald-500/5 border-emerald-500/20 text-emerald-400"
         )}>
-          {uploading
-            ? <Activity className="w-4 h-4 animate-spin flex-shrink-0" />
-            : <CheckCircle className="w-4 h-4 flex-shrink-0" />
-          }
-          {uploadMsg}
+          <div className="flex items-center gap-2">
+            {uploading
+              ? <Activity className="w-4 h-4 animate-spin flex-shrink-0" />
+              : <CheckCircle className="w-4 h-4 flex-shrink-0" />
+            }
+            {uploadMsg}
+          </div>
+          {uploading && progress < 100 && (
+            <div className="w-full h-1 bg-black rounded-full overflow-hidden mt-2">
+              <div className="h-full bg-[#FF6A00] transition-all duration-300" style={{ width: `${progress}%` }} />
+            </div>
+          )}
         </div>
       )}
 
       <div className="bg-[#0a0a0a] border border-[#1A1A1A] rounded-lg p-3">
-        <p className="text-[11px] font-semibold text-[#A0A0A0] uppercase tracking-wider mb-1.5">Expected columns</p>
-        <code className="text-[11px] text-[#6B7280] font-mono leading-relaxed">
-          inverter_id, timestamp, temperature, efficiency,<br />
-          power_output, voltage, current, alarm_count
-        </code>
+        <p className="text-[11px] font-semibold text-[#A0A0A0] uppercase tracking-wider mb-1.5">Compatible with the Solar Dataset format</p>
       </div>
     </div>
   );
@@ -458,21 +448,33 @@ export default function DashboardPage() {
     setTimeout(() => setToast({ show: false, message: "" }), 3000);
   }
 
-  function clearData() {
-    setInverters([]);
-    showToast("Dashboard data cleared");
+  async function refreshData() {
+    try {
+      setLoading(true);
+      const data = await getInverters();
+      setInverters(data);
+    } catch {
+      console.warn("API unavailable — using mock data");
+      setInverters(mockInverters);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function clearData() {
+    try {
+      const res = await fetch('/api/clear-db', { method: 'POST' });
+      if (res.ok) {
+        setInverters([]);
+        showToast("Dashboard data cleared from database");
+      }
+    } catch (e) {
+      console.error("Failed to clear DB", e);
+    }
   }
 
   useEffect(() => {
-    getInverters()
-      .then((data) => {
-        setInverters(data.length > 0 ? data : mockInverters);
-      })
-      .catch(() => {
-        console.warn("API unavailable — using mock data");
-        setInverters(mockInverters);
-      })
-      .finally(() => setLoading(false));
+    refreshData();
   }, []);
 
   const healthy = inverters.filter((i) => i.status === "Healthy").length;
@@ -603,8 +605,8 @@ export default function DashboardPage() {
             <FileSpreadsheet className="w-4 h-4 text-[#FF6A00]" />
             <h2 className="text-sm font-semibold text-white">Upload Telemetry Data</h2>
           </div>
-          <p className="text-xs text-[#666] mb-4">Import historical inverter data via CSV</p>
-          <CSVUploadPanel setInverters={setInverters} showToast={showToast} />
+          <p className="text-xs text-[#666] mb-4">Import historical inverter data via CSV (analyzed by AI backend)</p>
+          <CSVUploadPanel setInverters={setInverters} showToast={showToast} refreshData={refreshData} />
         </div>
       </div>
 

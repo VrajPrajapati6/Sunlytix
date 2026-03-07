@@ -537,9 +537,9 @@ def _process_csv_job(job_id: str, csv_path: str):
                         st["temp_max"] = max(st["temp_max"], float(temp_col.max()))
                 
                 if mac not in mac_data:
-                    mac_data[mac] = inv_chunk.tail(24)
+                    mac_data[mac] = inv_chunk.tail(1440)
                 else:
-                    mac_data[mac] = pd.concat([mac_data[mac], inv_chunk]).tail(24)
+                    mac_data[mac] = pd.concat([mac_data[mac], inv_chunk]).tail(1440)
                     
         macs = list(mac_data.keys())
         job["totalInverters"] = len(macs)
@@ -550,10 +550,11 @@ def _process_csv_job(job_id: str, csv_path: str):
         
         # Safe connecting with timeout
         from pymongo import MongoClient
-        if not globals().get('MONGODB_URI'):
+        mongodb_uri = os.environ.get('MONGODB_URI')
+        if not mongodb_uri:
             raise Exception("MONGODB_URI is not set in environment.")
 
-        client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
+        client = MongoClient(mongodb_uri, serverSelectionTimeoutMS=5000)
         db = client["sunlytix"]
 
         db.inverters.delete_many({})
@@ -568,7 +569,9 @@ def _process_csv_job(job_id: str, csv_path: str):
 
         for idx, mac in enumerate(macs):
             inv_data = mac_data[mac]
-            inv_name = _MAC_TO_NAME.get(mac, f"INV-{mac[:6]}")
+            # Use a clean version of the full MAC address for unknown inverters
+            clean_mac = str(mac).replace(" ", "_")
+            inv_name = _MAC_TO_NAME.get(mac, f"INV-{clean_mac}")
             plant = _MAC_TO_PLANT.get(mac, "Unknown")
             latest = inv_data.iloc[-1]
             st = inverter_stats[mac]
@@ -694,13 +697,13 @@ def _process_csv_job(job_id: str, csv_path: str):
         if telemetry_docs: db.telemetry.insert_many(telemetry_docs)
         if insight_docs: db.insights.insert_many(insight_docs)
 
-        job["status"] = "done"
+        job["status"] = "completed"
         job["progress"] = 100
         job["message"] = f"Successfully processed {len(macs)} inverters."
         job["results"] = results
 
     except Exception as e:
-        job["status"] = "error"
+        job["status"] = "failed"
         job["message"] = f"Processing error: {str(e)}"
         import traceback
         traceback.print_exc()
@@ -714,7 +717,7 @@ def _process_csv_job(job_id: str, csv_path: str):
 async def upload_csv(file: UploadFile = File(...)):
     if _model is None or _feature_columns is None:
         raise HTTPException(status_code=503, detail="ML model not loaded.")
-    if not globals().get('MONGODB_URI'):
+    if not os.environ.get('MONGODB_URI'):
         raise HTTPException(status_code=503, detail="MONGODB_URI not configured.")
 
     if not file.filename or not file.filename.endswith(".csv"):

@@ -49,6 +49,7 @@ export interface TelemetryPoint {
 export interface Insight {
   id: string;
   inverterId: string;
+  plant: string;
   title: string;
   description: string;
   severity: "low" | "medium" | "high";
@@ -339,54 +340,64 @@ export function getMockTelemetry(inverterId: string): TelemetryPoint[] {
 export const mockInsights: Insight[] = [
   {
     id: "INS-001",
-    inverterId: "INV-05",
-    title: "High Risk — Thermal Stress Detected",
-    description:
-      "Inverter INV-05 (Plant 3, MAC: 54-10-EC-8C-14-6E) shows elevated inverter_temp at 62°C with temp_difference of 23°C. 3 alarm codes triggered. Immediate cooling system inspection required.",
-    severity: "high",
-    timestamp: "2026-03-07T08:30:00Z",
-    actionRequired: "Inspect cooling fans and ventilation in Plant 3",
+    inverterId: "INV-04",
+    plant: "Plant 2",
+    title: "Medium Risk — INV-04 Shows Warning Signs",
+    description: "The INV-04 inverter at Plant 2 has a medium risk level of 0.39, indicating potential issues. The top contributing factors are the inverter's alarm code and grid frequency, which are driving the risk prediction in opposite directions. To mitigate this risk, the operator should investigate the alarm code and verify the grid frequency is within the acceptable threshold, and also check the inverter temperature (42.95C) to ensure it's not causing any issues. Next steps include reviewing the inverter's alarm history and performing a temperature check to ensure optimal operating conditions.",
+    severity: "medium",
+    timestamp: "2026-03-07T10:01:00Z",
+    actionRequired: "Schedule maintenance for INV-04 within 2 weeks",
   },
   {
     id: "INS-002",
     inverterId: "INV-03",
-    title: "High Risk — Power Degradation",
-    description:
-      "INV-03 (Plant 2, MAC: ICR2-LT2) shows power output at 3200W vs expected 4500W. Inverter temp at 58°C, rolling_mean_power_24h dropped to 2400W. Alarm code 2 active.",
-    severity: "high",
-    timestamp: "2026-03-07T07:15:00Z",
-    actionRequired: "Check PV string connections and inverter IGBT",
+    plant: "Plant 2",
+    title: "Medium Risk — INV-03 Shows Warning Signs",
+    description: "The INV-03 inverter at Plant 2 has a medium risk level of 0.48, indicating a potential issue that requires attention. The top contributing factors driving this prediction are the energy total and power factor, which have a positive and negative impact respectively. To mitigate this risk, it is recommended to investigate the cause of the zero power output and high temperature of 42.95C, and verify the inverter's alarm code to ensure no underlying issues are present. The operator should also review the energy total and power factor trends to identify any anomalies.",
+    severity: "medium",
+    timestamp: "2026-03-07T10:01:00Z",
+    actionRequired: "Schedule maintenance for INV-03 within 2 weeks",
   },
   {
     id: "INS-003",
-    inverterId: "INV-04",
-    title: "Medium Risk — Efficiency Declining",
-    description:
-      "INV-04 (Plant 2) power_factor dropped to 0.95 with rising temp_difference (14°C). Rolling power std deviation elevated at 1520W. Schedule maintenance within 2 weeks.",
+    inverterId: "INV-05",
+    plant: "Plant 3",
+    title: "Medium Risk — INV-05 Shows Warning Signs",
+    description: "The INV-05 inverter at Plant 3 has a medium risk level of 0.43, indicating a potential issue that requires attention. The top contributing factors driving this prediction are the absence of an alarm code (-0.104) and high grid power (0.007).",
     severity: "medium",
-    timestamp: "2026-03-06T22:00:00Z",
-    actionRequired: "Schedule preventive maintenance for INV-04",
+    timestamp: "2026-03-07T10:01:00Z",
+    actionRequired: "Schedule maintenance for INV-05 within 2 weeks",
   },
   {
     id: "INS-004",
     inverterId: "INV-01",
+    plant: "Plant 1",
     title: "Healthy — Optimal Performance",
-    description:
-      "INV-01 (Plant 1) operating at peak efficiency. Power factor 0.98, inverter_temp stable at 42°C. No alarms. Energy today: 28.4 kWh.",
+    description: "INV-01 (Plant 1) operating at peak efficiency. Power factor 0.98, inverter_temp stable at 42.95°C. No alarms. Risk level is low at 0.14.",
     severity: "low",
     timestamp: "2026-03-07T09:00:00Z",
     actionRequired: "No action required — continue monitoring",
   },
   {
     id: "INS-005",
-    inverterId: "INV-06",
+    inverterId: "INV-02",
+    plant: "Plant 1",
     title: "Healthy — Stable Output",
-    description:
-      "INV-06 (Plant 3) performing well despite Plant 3 conditions. Power output 4200W, temp stable at 46°C. Good candidate for reference baseline.",
+    description: "INV-02 (Plant 1) performing well with stable temperatures around 42.95°C. Low risk score of 0.12.",
     severity: "low",
     timestamp: "2026-03-06T16:30:00Z",
     actionRequired: "No action required",
   },
+  {
+    id: "INS-006",
+    inverterId: "INV-06",
+    plant: "Plant 3",
+    title: "Healthy — Optimal Performance",
+    description: "INV-06 (Plant 3) performing well with optimal temperature. Risk score of 0.00.",
+    severity: "low",
+    timestamp: "2026-03-06T12:00:00Z",
+    actionRequired: "No action required",
+  }
 ];
 
 export const mockFeatureImportance = [

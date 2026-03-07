@@ -12,7 +12,7 @@ export default function InvertersPage() {
 
   useEffect(() => {
     getInverters()
-      .then((data) => setInverters(data.length > 0 ? data : mockInverters))
+      .then((data) => setInverters(data))
       .catch(() => {
         console.warn("API unavailable — using mock data");
         setInverters(mockInverters);

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { BrainCircuit, Activity, Filter, Printer } from "lucide-react";
-import InsightCard from "@/components/InsightCard";
+import InsightTable from "@/components/InsightTable";
 import { getInsights } from "@/services/api";
 import { mockInsights, type Insight } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ export default function InsightsPage() {
   useEffect(() => {
     setPrintDate(new Date().toLocaleString());
     getInsights()
-      .then((data) => setInsights(data.length > 0 ? data : mockInsights))
+      .then((data) => setInsights(data))
       .catch(() => {
         console.warn("API unavailable — using mock data");
         setInsights(mockInsights);
@@ -43,7 +43,7 @@ export default function InsightsPage() {
   ];
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto px-4 lg:px-6 py-6 print:m-0 print:p-0">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 lg:px-8 py-6 print:m-0 print:p-0">
       {/* Header */}
       <div className="flex justify-between items-start print:hidden">
         <div>
@@ -113,16 +113,7 @@ export default function InsightsPage() {
           </div>
         </div>
       ) : (
-        <div className="space-y-3">
-          {filtered.map((insight) => (
-            <InsightCard key={insight.id} insight={insight} />
-          ))}
-          {filtered.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground text-sm">
-              No insights for this filter.
-            </div>
-          )}
-        </div>
+        <InsightTable insights={filtered} />
       )}
     </div>
   );
