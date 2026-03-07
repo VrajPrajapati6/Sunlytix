@@ -22,7 +22,7 @@ const riskBarColor: Record<InverterStatus, string> = {
   "High Risk": "bg-[#FF4D4F]",
 };
 
-type SortField = keyof Pick<Inverter, "id" | "location" | "MODULE_TEMPERATURE" | "DC_POWER" | "AC_POWER" | "IRRADIATION" | "riskScore">;
+type SortField = keyof Pick<Inverter, "id" | "mac" | "location" | "MODULE_TEMPERATURE" | "DC_POWER" | "AC_POWER" | "riskScore">;
 type SortDir = "asc" | "desc";
 
 export default function InverterTable({ inverters }: InverterTableProps) {
@@ -97,7 +97,7 @@ export default function InverterTable({ inverters }: InverterTableProps) {
                   { field: "MODULE_TEMPERATURE", label: "Module Temp" },
                   { field: "DC_POWER", label: "DC Power" },
                   { field: "AC_POWER", label: "AC Power" },
-                  { field: "IRRADIATION", label: "Irradiation" },
+                  { field: "mac", label: "MAC Address" },
                   { field: "riskScore", label: "Risk Score" },
                 ] as { field: SortField; label: string }[]
               ).map(({ field, label }) => (
@@ -145,7 +145,7 @@ export default function InverterTable({ inverters }: InverterTableProps) {
                 </td>
                 <td className="px-4 py-3 text-foreground">{inv.DC_POWER} W</td>
                 <td className="px-4 py-3 text-foreground">{inv.AC_POWER} W</td>
-                <td className="px-4 py-3 text-muted-foreground">{inv.IRRADIATION} W/m²</td>
+                <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{inv.mac || "-"}</td>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <div className="w-20 h-1.5 bg-secondary rounded-full overflow-hidden">
