@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { RiskDistributionChart, PowerTrendChart, TempTrendChart } from "@/components/Charts";
 import { getInverters } from "@/services/api";
-import { mockInverters, mockPowerTrend, mockTempTrend, type Inverter } from "@/lib/mockData";
+import { mockInverters, mockPowerTrend, mockTempTrend, type Inverter, type InverterStatus } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
 
 /* ─── Animated Counter ─── */
@@ -303,7 +303,66 @@ function MonitoringTerminal() {
 }
 
 /* ─── CSV Upload Panel ─── */
-function CSVUploadPanel() {
+function parseCSV(csvText: string): Inverter[] {
+  const lines = csvText.trim().split('\n');
+  if (lines.length < 2) throw new Error('Invalid CSV: no data rows');
+
+  const headers = lines[0].split(',').map(h => h.trim());
+  const expected = ['inverter_id', 'timestamp', 'temperature', 'efficiency', 'power_output', 'voltage', 'current', 'alarm_count'];
+
+  if (!expected.every(e => headers.includes(e))) throw new Error('Invalid CSV: missing required columns');
+
+  const inverters: Inverter[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',').map(v => v.trim());
+    if (values.length !== headers.length) continue;
+
+    const row: any = {};
+    headers.forEach((h, idx) => row[h] = values[idx]);
+
+    const status: InverterStatus = parseInt(row.alarm_count) > 0 ? 'High Risk' : 'Healthy';
+
+    const inverter: Inverter = {
+      id: row.inverter_id,
+      mac: row.inverter_id,
+      plant: 'Uploaded',
+      inverter_power: parseFloat(row.power_output) || 0,
+      pv1_power: 0,
+      pv2_power: 0,
+      energy_today: 0,
+      energy_total: 0,
+      power_factor: 0,
+      grid_frequency: 0,
+      grid_power: parseFloat(row.power_output) || 0,
+      pv1_voltage: parseFloat(row.voltage) || 0,
+      pv2_voltage: 0,
+      pv1_current: parseFloat(row.current) || 0,
+      pv2_current: 0,
+      ambient_temperature: 0,
+      inverter_temp: parseFloat(row.temperature) || 0,
+      temp_difference: 0,
+      inverters_alarm_code: parseInt(row.alarm_count) || 0,
+      inverters_op_state: 0,
+      rolling_mean_power_24h: 0,
+      rolling_std_power_24h: 0,
+      failure_label: 0,
+      riskScore: parseInt(row.alarm_count) || 0,
+      status,
+      DC_POWER: 0,
+      AC_POWER: parseFloat(row.power_output) || 0,
+      MODULE_TEMPERATURE: parseFloat(row.temperature) || 0,
+      AMBIENT_TEMPERATURE: 0,
+      IRRADIATION: 0,
+      location: 'Uploaded',
+      runtimeHours: 0,
+      lastMaintenance: '',
+    };
+    inverters.push(inverter);
+  }
+  return inverters;
+}
+
+function CSVUploadPanel({ setInverters, showToast }: { setInverters: (inv: Inverter[]) => void; showToast: (msg: string) => void }) {
   const [uploadMsg, setUploadMsg] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -312,10 +371,27 @@ function CSVUploadPanel() {
     if (!file) return;
     setUploading(true);
     setUploadMsg(`Processing "${file.name}"…`);
-    setTimeout(() => {
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const csvText = event.target?.result as string;
+        const parsed = parseCSV(csvText);
+        setInverters(parsed);
+        setUploading(false);
+        setUploadMsg(`✓ "${file.name}" processed — ${parsed.length} inverters loaded`);
+        showToast('CSV data loaded successfully');
+      } catch (err) {
+        setUploading(false);
+        setUploadMsg(`✗ Error: ${(err as Error).message}`);
+      }
+    };
+    reader.onerror = () => {
       setUploading(false);
-      setUploadMsg(`✓ "${file.name}" uploaded — ${(file.size / 1024).toFixed(1)} KB`);
-    }, 1500);
+      setUploadMsg('✗ Error reading file');
+    };
+    reader.readAsText(file);
+
     // Reset input so same file can be re-selected
     e.target.value = "";
   }
@@ -528,7 +604,7 @@ export default function DashboardPage() {
             <h2 className="text-sm font-semibold text-white">Upload Telemetry Data</h2>
           </div>
           <p className="text-xs text-[#666] mb-4">Import historical inverter data via CSV</p>
-          <CSVUploadPanel />
+          <CSVUploadPanel setInverters={setInverters} showToast={showToast} />
         </div>
       </div>
 
