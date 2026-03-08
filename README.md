@@ -3,11 +3,13 @@
 > **Predict. Prevent. Power the Sun.**
 
 Team Members:
-- Vraj Prajapati - vrajprajapati6004@gmail.com - 9870098351
-- Prince Shah - 2406prince2006@gmail.com - 8141168498
-- Trupal Dholariya - dholariyatrupal06@gmail.com - 9879553148
-- Niyati Navadiya - niyatinavadiya321@gmail.com - 6355045469
-- Tanish Solanki - solankitanish2007@gmail.com - 9409530242
+- Vraj Prajapati - vrajprajapati6004@gmail.com - 9870098351-Nirma University'28
+- Prince Shah - 2406prince2006@gmail.com - 8141168498 - Nirma University'28
+- Trupal Dholariya - dholariyatrupal06@gmail.com - 9879553148 - Nirma University'28
+- Niyati Navadiya - niyatinavadiya321@gmail.com - 6355045469 - Nirma University'28
+- Tanish Solanki - solankitanish2007@gmail.com - 9409530242 - Nirma University'28
+
+  
 
 Sunlytix is an AI-powered platform that predicts solar inverter failures 7–10 days in advance and provides natural language operational guidance to plant operators.
 
